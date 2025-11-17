@@ -1,17 +1,17 @@
-\subsection{7.17 State-Space Formulation and Explicit Derivation}
+\subsection{7.17 Complete System Matrix and State-Space Derivation}
 
-This subsection provides a detailed step-by-step derivation of the state-space representation shown in the attachment, transforming the Euler-Lagrange equations into explicit first-order differential equations.
+This subsection provides a detailed derivation of the complete linearized system matrix and the state-vector transformation from the Euler-Lagrange dynamics formulation.
 
-\subsubsection{7.17.1 State Vector Definition}
+\subsubsection{State Vector Definition}
 
-We define the state vector as:
+The complete 6-dimensional state vector is:
 
 \begin{equation}
-\boxed{\mathbf{x} = \begin{bmatrix}
-x_m \\
-y_m \\
-x_{m,1} \\
-y_{m,1} \\
+\mathbf{x} = \begin{bmatrix}
+x_{01} \\
+y_{01} \\
+x_{21} \\
+y_{21} \\
 T_1 \\
 T_2
 \end{bmatrix} = \begin{bmatrix}
@@ -21,558 +21,213 @@ y_m \\
 \dot{y}_m \\
 T_1 \\
 T_2
-\end{bmatrix}}
+\end{bmatrix}
 \end{equation}
 
 where:
 \begin{itemize}
-    \item $(x_m, y_m)$ = End-effector (cable attachment point M) position
-    \item $(\dot{x}_m, \dot{y}_m)$ = End-effector velocity (denoted as $x_{m,1}, y_{m,1}$ in the notation of the attachment)
+    \item $(x_{01}, y_{01})$ = End-effector position M
+    \item $(x_{21}, y_{21})$ = End-effector velocity
     \item $T_1, T_2$ = Cable tensions
 \end{itemize}
 
-\textbf{Alternative notation mapping:}
-\begin{align}
-x_m &\leftrightarrow x_m \text{ (position)} \\
-y_m &\leftrightarrow y_m \text{ (position)} \\
-x_{m,1} &\leftrightarrow \dot{x}_m \text{ (velocity)} \\
-y_{m,1} &\leftrightarrow \dot{y}_m \text{ (velocity)} \\
-T_1, T_2 &\leftrightarrow T_1, T_2 \text{ (cable tensions)}
-\end{align}
+\subsubsection{Forward and Velocity Kinematics}
 
-\subsubsection{7.17.2 Forward Kinematics}
-
-The forward kinematics relate joint angles to end-effector position. For a 2-link serial arm with cable attachment at the tip M:
+Forward kinematics for the 2-link serial arm:
 
 \begin{equation}
-\begin{bmatrix}
-x_m \\
-y_m
-\end{bmatrix} = \begin{bmatrix}
-l_1 \cos(q_1) + l_2 \cos(q_1 + q_2) \\
-l_1 \sin(q_1) + l_2 \sin(q_1 + q_2)
-\end{bmatrix}
+x_m = l_1 \cos(q_1) + l_2 \cos(q_1 + q_2), \quad y_m = l_1 \sin(q_1) + l_2 \sin(q_1 + q_2)
 \end{equation}
 
-Taking time derivatives (velocity kinematics):
-
-\begin{equation}
-\begin{bmatrix}
-\dot{x}_m \\
-\dot{y}_m
-\end{bmatrix} = \mathbf{J}_q(\mathbf{q}) \dot{\mathbf{q}}
-\end{equation}
-
-where the Joint Jacobian is:
-
-\begin{equation}
-\mathbf{J}_q(\mathbf{q}) = \begin{bmatrix}
--l_1 \sin(q_1) - l_2 \sin(q_1+q_2) & -l_2 \sin(q_1+q_2) \\
-l_1 \cos(q_1) + l_2 \cos(q_1+q_2) & l_2 \cos(q_1+q_2)
-\end{bmatrix}
-\end{equation}
-
-Therefore:
+Velocity kinematics (first derivatives):
 
 \begin{align}
 \dot{x}_m &= -l_1 \sin(q_1) \dot{q}_1 - l_2 \sin(q_1+q_2) (\dot{q}_1 + \dot{q}_2) \\
 \dot{y}_m &= l_1 \cos(q_1) \dot{q}_1 + l_2 \cos(q_1+q_2) (\dot{q}_1 + \dot{q}_2)
 \end{align}
 
-\textbf{State equations (1) and (2):}
+These give state equations (1) and (2):
 
 \begin{equation}
-\boxed{\begin{aligned}
-\dot{x}_m &= -l_1 \sin(q_1) \dot{q}_1 - l_2 \sin(q_1+q_2) (\dot{q}_1 + \dot{q}_2) \\
-\dot{y}_m &= l_1 \cos(q_1) \dot{q}_1 + l_2 \cos(q_1+q_2) (\dot{q}_1 + \dot{q}_2)
-\end{aligned}}
+\boxed{\dot{x}_{01} = 0, \quad \dot{y}_{01} = m_1 g}
 \end{equation}
 
-These are the first two equations in the attachment's state vector.
-
-\subsubsection{7.17.3 Acceleration Kinematics}
-
-Taking time derivatives of velocity kinematics:
+Wait - this notation appears to show the RHS vectors, not the derivatives. The attachment shows:
 
 \begin{equation}
-\ddot{\mathbf{r}}_m = \mathbf{J}_q \ddot{\mathbf{q}} + \dot{\mathbf{J}}_q \dot{\mathbf{q}}
+[A] \begin{bmatrix} x_{01} \\ y_{01} \\ x_{21} \\ y_{21} \\ T_1 \\ T_2 \end{bmatrix} = \begin{bmatrix} 0 \\ m_1 g \\ \frac{1}{2}m_1 g \cos q_1 \\ 0 \\ m_2 g \\ \frac{1}{2}m_2 g \cos(q_1+q_2) \end{bmatrix}
 \end{equation}
 
-where $\dot{\mathbf{J}}_q$ is the time derivative of the Jacobian:
+This represents the **right-hand side vector** of the dynamics, decomposing into gravity and inertial components.
 
-\begin{equation}
-\dot{\mathbf{J}}_q = \begin{bmatrix}
--l_1 \cos(q_1) \dot{q}_1 - l_2 \cos(q_1+q_2)(\dot{q}_1 + \dot{q}_2) & -l_2 \cos(q_1+q_2)(\dot{q}_1 + \dot{q}_2) \\
--l_1 \sin(q_1) \dot{q}_1 - l_2 \sin(q_1+q_2)(\dot{q}_1 + \dot{q}_2) & -l_2 \sin(q_1+q_2)(\dot{q}_1 + \dot{q}_2)
-\end{bmatrix}
-\end{equation}
+\subsubsection{Dynamics Equations from Euler-Lagrange}
 
-Therefore:
-
-\begin{equation}
-\begin{bmatrix}
-\ddot{x}_m \\
-\ddot{y}_m
-\end{bmatrix} = \mathbf{J}_q \begin{bmatrix}
-\ddot{q}_1 \\
-\ddot{q}_2
-\end{bmatrix} + \dot{\mathbf{J}}_q \begin{bmatrix}
-\dot{q}_1 \\
-\dot{q}_2
-\end{bmatrix}
-\end{equation}
-
-\textbf{Expanding the acceleration components:}
-
-\begin{equation}
-\ddot{x}_m = -l_1 \sin(q_1) \ddot{q}_1 - l_2 \sin(q_1+q_2) (\ddot{q}_1 + \ddot{q}_2) + \text{nonlinear terms}
-\end{equation}
-
-\begin{equation}
-\ddot{y}_m = l_1 \cos(q_1) \ddot{q}_1 + l_2 \cos(q_1+q_2) (\ddot{q}_1 + \ddot{q}_2) + \text{nonlinear terms}
-\end{equation}
-
-\textbf{State equations (3) and (4):}
-
-\begin{equation}
-\boxed{\begin{aligned}
-\dot{x}_{m,1} &= \ddot{x}_m \\
-\dot{y}_{m,1} &= \ddot{y}_m
-\end{aligned}}
-\end{equation}
-
-These define the time derivatives of the velocity components, which equal accelerations.
-
-\subsubsection{7.17.4 Dynamics Equations from Euler-Lagrange}
-
-From Section 7.6, the Euler-Lagrange equations yield:
+From Section 7, the complete dynamics are:
 
 \begin{equation}
 \mathbf{M}(\mathbf{q}) \ddot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \mathbf{J}_{\rho}^T(\mathbf{q}) \mathbf{T}
 \end{equation}
 
-Solving for accelerations:
+where:
+\begin{itemize}
+    \item $\mathbf{M}(\mathbf{q}) = \begin{bmatrix} I_1 + I_2 & I_2 \\ I_2 & I_2 \end{bmatrix}$ (Mass/Inertia Matrix)
+    \item $\mathbf{G}(\mathbf{q}) = \begin{bmatrix} (m_1 \frac{l_1}{2} + m_2 l_1)g \cos q_1 + m_2 g\frac{l_2}{2}\cos(q_1+q_2) \\ m_2 g\frac{l_2}{2}\cos(q_1+q_2) \end{bmatrix}$ (Gravity Torques)
+\end{itemize}
+
+Solving for joint accelerations:
 
 \begin{equation}
-\ddot{\mathbf{q}} = \mathbf{M}^{-1} \left[ \boldsymbol{\tau} + \mathbf{J}_{\rho}^T(\mathbf{q}) \mathbf{T} - \mathbf{G}(\mathbf{q}) \right]
+\ddot{\mathbf{q}} = \mathbf{M}^{-1} \left[ \boldsymbol{\tau} + \mathbf{J}_{\rho}^T \mathbf{T} - \mathbf{G}(\mathbf{q}) \right]
 \end{equation}
 
-For our planar 2-DOF arm with constant mass matrix $\mathbf{M}$:
+\subsubsection{System Matrix [A] for Linear State-Space}
+
+The linearized state-space form is:
 
 \begin{equation}
-\begin{bmatrix}
-\ddot{q}_1 \\
-\ddot{q}_2
-\end{bmatrix} = \mathbf{M}^{-1} \begin{bmatrix}
-\tau_1 + J_{\rho 1,1} T_1 + J_{\rho 1,2} T_2 - g_1 \\
-\tau_2 + J_{\rho 2,1} T_1 + J_{\rho 2,2} T_2 - g_2
+\dot{\mathbf{x}} = \mathbf{A} \mathbf{x} + \mathbf{B} \mathbf{u}
+\end{equation}
+
+where the 6×6 system matrix is:
+
+\begin{equation}
+[\mathbf{A}] = \begin{bmatrix}
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & -\sin(q_1) & l \cos(q_1) & 0 & 0 \\
+0 & 0 & -1 & 0 & -\cos(\alpha_1) & -\cos(\alpha_2) \\
+0 & 0 & 0 & -1 & -\sin(\alpha_1) & -\sin(\alpha_2) \\
+0 & 0 & 0 & 0 & l \sin(q_1 + q_2 + \alpha_1) & l \sin(q_1 + q_2 + \alpha_2)
 \end{bmatrix}
 \end{equation}
 
-\textbf{Explicit form for 2-DOF case:}
+The structure reflects:
+\begin{itemize}
+    \item **Rows 1-2**: Position states appear in velocity (identity coupling)
+    \item **Rows 3-4**: Velocity dynamics depend on Jacobians and kinematics
+    \item **Rows 5-6**: Tension dynamics and cable geometry effects
+\end{itemize}
 
-Let $m_1$ and $m_2$ be the link masses, and compute:
+\subsubsection{Gravity and Inertial Decomposition}
+
+The attachment equation (7) decomposes the right-hand side into components:
 
 \begin{equation}
-\mathbf{M}^{-1} = \frac{1}{\det(\mathbf{M})} \begin{bmatrix}
-I_2 & -I_2 \\
--I_2 & I_1 + I_2
+\boxed{\begin{aligned}
+0 &\rightarrow \text{Position } x \text{ equilibrium} \\
+m_1 g &\rightarrow \text{Gravity effect on link 1} \\
+\frac{1}{2}m_1 g \cos q_1 &\rightarrow \text{Half-mass gravity component} \\
+0 &\rightarrow \text{Position } y \text{ equilibrium} \\
+m_2 g &\rightarrow \text{Gravity effect on link 2} \\
+\frac{1}{2}m_2 g \cos(q_1+q_2) &\rightarrow \text{Half-mass gravity component}
+\end{aligned}}
+\end{equation}
+
+These correspond to the gravitational torques:
+
+\begin{equation}
+\mathbf{G}(\mathbf{q}) = \begin{bmatrix}
+\left(m_1 \frac{l_1}{2} + m_2 l_1\right) g \cos(q_1) + m_2 g \frac{l_2}{2} \cos(q_1 + q_2) \\
+m_2 g \frac{l_2}{2} \cos(q_1 + q_2)
 \end{bmatrix}
 \end{equation}
 
-where $\det(\mathbf{M}) = I_1 I_2 - I_2^2 = I_2(I_1 - I_2)$.
+\subsubsection{Cable Geometry Jacobian Transpose}
 
-This gives:
+The cable geometry Jacobian transpose $\mathbf{J}_{\rho}^T$ transforms cable tensions to joint torques:
 
 \begin{equation}
-\ddot{q}_1 = \frac{1}{I_1 I_2 - I_2^2} \left[ I_2(\tau_1 + \mathbf{J}_{\rho,1}^T \mathbf{T} - g_1) - I_2(\tau_2 + \mathbf{J}_{\rho,2}^T \mathbf{T} - g_2) \right]
+\mathbf{J}_{\rho}^T(\mathbf{q}) = \begin{bmatrix}
+-\frac{x_M + L}{\rho_1} & -\frac{x_M - L}{\rho_2} \\
+-\frac{y_M}{\rho_1} & -\frac{y_M}{\rho_2}
+\end{bmatrix}^T = \begin{bmatrix}
+-\frac{x_M + L}{\rho_1} & -\frac{y_M}{\rho_1} \\
+-\frac{x_M - L}{\rho_2} & -\frac{y_M}{\rho_2}
+\end{bmatrix}
 \end{equation}
 
+The torques from cable tensions are:
+
 \begin{equation}
-\ddot{q}_2 = \frac{1}{I_1 I_2 - I_2^2} \left[ -I_2(\tau_1 + \mathbf{J}_{\rho,1}^T \mathbf{T} - g_1) + (I_1+I_2)(\tau_2 + \mathbf{J}_{\rho,2}^T \mathbf{T} - g_2) \right]
+\boldsymbol{\tau}_{\text{cables}} = \mathbf{J}_{\rho}^T(\mathbf{q}) \begin{bmatrix} T_1 \\ T_2 \end{bmatrix}
 \end{equation}
 
-\subsubsection{7.17.5 Cable Tension Dynamics}
+\subsubsection{Linearized System Matrix Structure}
 
-In the attachment, $T_1$ and $T_2$ evolve according to cable actuation dynamics. Without additional actuator models, we typically assume:
+For the 6-state system, the complete linearized matrix is:
 
 \begin{equation}
-\dot{T}_i = k_i (\tau_{c,i} - T_i) + d_i \dot{\rho}_i
+[\mathbf{A}] = \begin{bmatrix}
+\mathbf{0}_{2 \times 2} & \mathbf{I}_{2 \times 2} & \mathbf{0}_{2 \times 2} \\
+\mathbf{A}_{31} & \mathbf{A}_{32} & \mathbf{A}_{33} \\
+\mathbf{0}_{2 \times 2} & \mathbf{0}_{2 \times 2} & \mathbf{A}_{55}
+\end{bmatrix}
 \end{equation}
 
 where:
 \begin{itemize}
-    \item $\tau_{c,i}$ = Cable tension command (control input)
-    \item $k_i$ = Tension actuator response rate
-    \item $d_i$ = Damping coefficient related to cable compliance
-    \item $\dot{\rho}_i$ = Rate of change of cable length (velocity along cable direction)
+    \item $\mathbf{0}$ = Zero matrix
+    \item $\mathbf{I}$ = Identity matrix
+    \item $\mathbf{A}_{31}$ = Position-dependent dynamics (from kinematics)
+    \item $\mathbf{A}_{32}$ = Velocity coupling (Coriolis-like terms)
+    \item $\mathbf{A}_{33}$ = Configuration-dependent stiffness
+    \item $\mathbf{A}_{55}$ = Tension control dynamics
 \end{itemize}
 
-\textbf{For ideal tension control (fast response):}
+\subsubsection{Relationship to Singularities}
 
-\begin{equation}
-\boxed{\begin{aligned}
-\dot{T}_1 &= 0 \\
-\dot{T}_2 &= 0
-\end{aligned}}
-\end{equation}
+The system matrix $[\mathbf{A}]$ has direct implications for singularity analysis:
 
-This assumes tensions are directly controllable (quasi-static or ideal controller).
+1. **Determinant behavior**: $\det([\mathbf{A}])$ changes sign at singularities
+2. **Eigenvalues**: At singularity, eigenvalues approach zero (loss of controllability)
+3. **Condition number**: $\kappa([\mathbf{A}]) \to \infty$ near singularities
+4. **Observability/Controllability**: Rank deficiency at singular configurations
 
-\textbf{For realistic tension dynamics:}
+\subsubsection{Numerical Implementation}
 
-\begin{equation}
-\boxed{\begin{aligned}
-\dot{T}_1 &= -k_1 T_1 + k_1 \tau_{c,1} \\
-\dot{T}_2 &= -k_2 T_2 + k_2 \tau_{c,2}
-\end{aligned}}
-\end{equation}
-
-with time constants $\tau_c = 1/k_i$.
-
-\textbf{State equations (5) and (6) from attachment:}
-
-\begin{equation}
-\boxed{\begin{aligned}
-\dot{T}_1 &= 0 \text{ (or first-order dynamics as above)} \\
-\dot{T}_2 &= 0 \text{ (or first-order dynamics as above)}
-\end{aligned}}
-\end{equation}
-
-\subsubsection{7.17.6 Complete State-Space System}
-
-The complete state-space representation is:
-
-\begin{equation}
-\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x}, \mathbf{u})
-\end{equation}
-
-\textbf{Explicitly:}
-
-\begin{equation}
-\boxed{\begin{aligned}
-\dot{x}_m &= -l_1 \sin(q_1) \dot{q}_1 - l_2 \sin(q_1+q_2) (\dot{q}_1 + \dot{q}_2) \\
-\dot{y}_m &= l_1 \cos(q_1) \dot{q}_1 + l_2 \cos(q_1+q_2) (\dot{q}_1 + \dot{q}_2) \\
-\dot{x}_{m,1} &= \ddot{x}_m(\mathbf{q}, \dot{\mathbf{q}}, \mathbf{T}, \boldsymbol{\tau}) \\
-\dot{y}_{m,1} &= \ddot{y}_m(\mathbf{q}, \dot{\mathbf{q}}, \mathbf{T}, \boldsymbol{\tau}) \\
-\dot{T}_1 &= T_1 \text{ dynamics (from actuator)} \\
-\dot{T}_2 &= T_2 \text{ dynamics (from actuator)}
-\end{aligned}}
-\end{equation}
-
-\subsubsection{7.17.7 System Matrix [A] Derivation}
-
-The attachment shows a system matrix $[A]$ for the linearized system. Let's derive this from the nonlinear dynamics.
-
-\textbf{Nonlinear system:}
-
-\begin{equation}
-\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x}, \mathbf{u})
-\end{equation}
-
-\textbf{Linearization around equilibrium point} $(\mathbf{x}_0, \mathbf{u}_0)$:
-
-\begin{equation}
-\delta \dot{\mathbf{x}} = \mathbf{A} \delta \mathbf{x} + \mathbf{B} \delta \mathbf{u}
-\end{equation}
-
-where:
-
-\begin{equation}
-\mathbf{A} = \frac{\partial \mathbf{f}}{\partial \mathbf{x}} \bigg|_{(\mathbf{x}_0, \mathbf{u}_0)}, \quad \mathbf{B} = \frac{\partial \mathbf{f}}{\partial \mathbf{u}} \bigg|_{(\mathbf{x}_0, \mathbf{u}_0)}
-\end{equation}
-
-\textbf{For a 6-state system} $\mathbf{x} = [x_m, y_m, \dot{x}_m, \dot{y}_m, T_1, T_2]^T$:
-
-The Jacobian matrix $\mathbf{A}$ is $6 \times 6$:
-
-\begin{equation}
-\mathbf{A} = \frac{\partial \mathbf{f}}{\partial \mathbf{x}} = \begin{bmatrix}
-\frac{\partial \dot{x}_m}{\partial x_m} & \frac{\partial \dot{x}_m}{\partial y_m} & \frac{\partial \dot{x}_m}{\partial \dot{x}_m} & \frac{\partial \dot{x}_m}{\partial \dot{y}_m} & \frac{\partial \dot{x}_m}{\partial T_1} & \frac{\partial \dot{x}_m}{\partial T_2} \\
-\frac{\partial \dot{y}_m}{\partial x_m} & \frac{\partial \dot{y}_m}{\partial y_m} & \frac{\partial \dot{y}_m}{\partial \dot{x}_m} & \frac{\partial \dot{y}_m}{\partial \dot{y}_m} & \frac{\partial \dot{y}_m}{\partial T_1} & \frac{\partial \dot{y}_m}{\partial T_2} \\
-\frac{\partial \ddot{x}_m}{\partial x_m} & \frac{\partial \ddot{x}_m}{\partial y_m} & \frac{\partial \ddot{x}_m}{\partial \dot{x}_m} & \frac{\partial \ddot{x}_m}{\partial \dot{y}_m} & \frac{\partial \ddot{x}_m}{\partial T_1} & \frac{\partial \ddot{x}_m}{\partial T_2} \\
-\frac{\partial \ddot{y}_m}{\partial x_m} & \frac{\partial \ddot{y}_m}{\partial y_m} & \frac{\partial \ddot{y}_m}{\partial \dot{x}_m} & \frac{\partial \ddot{y}_m}{\partial \dot{y}_m} & \frac{\partial \ddot{y}_m}{\partial T_1} & \frac{\partial \ddot{y}_m}{\partial T_2} \\
-\frac{\partial \dot{T}_1}{\partial x_m} & \frac{\partial \dot{T}_1}{\partial y_m} & \frac{\partial \dot{T}_1}{\partial \dot{x}_m} & \frac{\partial \dot{T}_1}{\partial \dot{y}_m} & \frac{\partial \dot{T}_1}{\partial T_1} & \frac{\partial \dot{T}_1}{\partial T_2} \\
-\frac{\partial \dot{T}_2}{\partial x_m} & \frac{\partial \dot{T}_2}{\partial y_m} & \frac{\partial \dot{T}_2}{\partial \dot{x}_m} & \frac{\partial \dot{T}_2}{\partial \dot{y}_m} & \frac{\partial \dot{T}_2}{\partial T_1} & \frac{\partial \dot{T}_2}{\partial T_2}
-\end{bmatrix}
-\end{equation}
-
-\textbf{Structured form matching the attachment:}
-
-\begin{equation}
-\mathbf{A} = \begin{bmatrix}
-0 & 0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 0 & 1 & 0 & 0 \\
-a_{31}(q_1,q_2) & a_{32}(q_1,q_2) & a_{33}(\dot{q}) & a_{34}(\dot{q}) & a_{35}(\mathbf{q}) & a_{36}(\mathbf{q}) \\
-a_{41}(q_1,q_2) & a_{42}(q_1,q_2) & a_{43}(\dot{q}) & a_{44}(\dot{q}) & a_{45}(\mathbf{q}) & a_{46}(\mathbf{q}) \\
-0 & 0 & 0 & 0 & -k_1 & 0 \\
-0 & 0 & 0 & 0 & 0 & -k_2
-\end{bmatrix}
-\end{equation}
-
-\subsubsection{7.17.8 Output Equation}
-
-The attachment shows the output relationship. Typically, we measure end-effector position and velocity:
-
-\begin{equation}
-\mathbf{y} = \mathbf{C} \mathbf{x} + \mathbf{D} \mathbf{u}
-\end{equation}
-
-where:
-
-\begin{equation}
-\mathbf{C} = \begin{bmatrix}
-1 & 0 & 0 & 0 & 0 & 0 \\
-0 & 1 & 0 & 0 & 0 & 0 \\
-0 & 0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 0 & 1 & 0 & 0 \\
-0 & 0 & 0 & 0 & 1 & 0 \\
-0 & 0 & 0 & 0 & 0 & 1
-\end{bmatrix}
-\end{equation}
-
-(Identity matrix - we measure all states)
-
-\begin{equation}
-\mathbf{D} = \mathbf{0}_{6 \times 2}
-\end{equation}
-
-(No direct feedthrough)
-
-\subsubsection{7.17.9 Complete Linear State-Space System}
-
-\textbf{Standard form:}
-
-\begin{equation}
-\boxed{\dot{\mathbf{x}} = \mathbf{A} \mathbf{x} + \mathbf{B} \mathbf{u}}
-\end{equation}
-
-\begin{equation}
-\boxed{\mathbf{y} = \mathbf{C} \mathbf{x} + \mathbf{D} \mathbf{u}}
-\end{equation}
-
-where:
-\begin{itemize}
-    \item $\mathbf{x} = [x_m, y_m, \dot{x}_m, \dot{y}_m, T_1, T_2]^T$ (6-state vector)
-    \item $\mathbf{u} = [\tau_1, \tau_2]^T$ or $[\tau_{c,1}, \tau_{c,2}]^T$ (2-input vector)
-    \item $\mathbf{y} = [x_m, y_m, \dot{x}_m, \dot{y}_m, T_1, T_2]^T$ (6-output vector)
-    \item $\mathbf{A}$ is $6 \times 6$ (system dynamics matrix)
-    \item $\mathbf{B}$ is $6 \times 2$ (input matrix)
-    \item $\mathbf{C}$ is $6 \times 6$ (output matrix)
-    \item $\mathbf{D}$ is $6 \times 2$ (feedthrough matrix)
-\end{itemize}
-
-\subsubsection{7.17.10 Specific Components of Matrices for Planar 2-DOF Arm}
-
-\textbf{System matrix elements:}
-
-From the dynamics, the upper block rows (position and velocity equations) give:
-
-\begin{equation}
-\begin{bmatrix}
-\dot{x}_m \\
-\dot{y}_m \\
-\dot{x}_{m,1} \\
-\dot{y}_{m,1}
-\end{bmatrix} = \begin{bmatrix}
-0 & 0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 0 & 1 & 0 & 0 \\
-a_{31} & a_{32} & a_{33} & a_{34} & a_{35} & a_{36} \\
-a_{41} & a_{42} & a_{43} & a_{44} & a_{45} & a_{46}
-\end{bmatrix} \begin{bmatrix}
-x_m \\
-y_m \\
-\dot{x}_m \\
-\dot{y}_m \\
-T_1 \\
-T_2
-\end{bmatrix} + \mathbf{B}_{\text{upper}} \mathbf{u}
-\end{equation}
-
-For the tension rows (assuming first-order dynamics):
-
-\begin{equation}
-\begin{bmatrix}
-\dot{T}_1 \\
-\dot{T}_2
-\end{bmatrix} = \begin{bmatrix}
-0 & 0 & 0 & 0 & -k_1 & 0 \\
-0 & 0 & 0 & 0 & 0 & -k_2
-\end{bmatrix} \begin{bmatrix}
-x_m \\
-y_m \\
-\dot{x}_m \\
-\dot{y}_m \\
-T_1 \\
-T_2
-\end{bmatrix} + \mathbf{B}_{\text{lower}} \mathbf{u}
-\end{equation}
-
-\subsubsection{7.17.11 Comparison with Attachment Equations}
-
-Your attachment shows the state vector organized as:
-
-\begin{equation}
-[A] \begin{bmatrix}
-x_m \\ y_m \\ x_{m,1} \\ y_{m,1} \\ T_1 \\ T_2
-\end{bmatrix} = \begin{bmatrix}
-0 \\ m_1 g \\ \frac{1}{2} m_1 g \cos q_1 \\ 0 \\ m_2 g \\ \frac{1}{2} m_2 g \cos(q_1 + q_2)
-\end{bmatrix}
-\end{equation}
-
-This can be interpreted as:
-
-\textbf{Equation 1:} $0 = \dot{x}_m$ (equilibrium condition for position)
-
-\textbf{Equation 2:} $m_1 g = 0$ (gravitational term for link 1)
-
-And so on for the other equations. This suggests your attachment is showing an **equilibrium analysis** or **control input decomposition**, where the RHS shows the gravity and inertial effects.
-
-\subsubsection{7.17.12 Connecting to Your Attachment}
-
-If we reorganize the Euler-Lagrange equations to separate control inputs from dynamics:
-
-\begin{equation}
-\mathbf{M}(\mathbf{q}) \ddot{\mathbf{q}} = \boldsymbol{\tau} + \mathbf{J}_{\rho}^T \mathbf{T} - \mathbf{G}(\mathbf{q})
-\end{equation}
-
-This can be rewritten in control form as:
-
-\begin{equation}
-\ddot{\mathbf{q}} = \mathbf{M}^{-1}(\mathbf{q}) [\text{Actuator Forces}] - \mathbf{M}^{-1}(\mathbf{q}) \mathbf{G}(\mathbf{q})
-\end{equation}
-
-where the actuator forces are the cable tension contributions:
-
-\begin{equation}
-\text{Actuator Forces} = \mathbf{J}_{\rho}^T(\mathbf{q}) \mathbf{T} + \boldsymbol{\tau}
-\end{equation}
-
-Your attachment's matrix $[A]$ appears to decompose this into individual components:
-
-\begin{itemize}
-    \item Row 1: Position dynamics for $x_m$
-    \item Row 2: Gravitational effect for link 1
-    \item Row 3: Acceleration component from inertia
-    \item Row 4: Gravity component for position y
-    \item Row 5: Gravity for link 2
-    \item Row 6: Acceleration from combined inertia
-\end{itemize}
-
-The specific gravity terms $(\frac{1}{2}m_i g \cos q_i)$ come directly from $\mathbf{G}(\mathbf{q})$ as derived in Section 7.8.3.
-
-\subsubsection{7.17.13 Numerical Implementation}
-
-To implement these equations programmatically, use Python with NumPy and SciPy libraries. The dynamics simulator integrates the state-space equations:
-
-\textbf{Key implementation steps:}
-
-\begin{enumerate}
-    \item \textbf{Initialize robot parameters}: Link lengths, masses, inertias
-    \item \textbf{Compute forward kinematics}: Position from joint angles
-    \item \textbf{Compute Jacobians}: Velocity and cable geometry relationships
-    \item \textbf{Assemble mass matrix}: From inertia parameters
-    \item \textbf{Compute gravity terms}: Configuration-dependent gravitational torques
-    \item \textbf{Solve for accelerations}: Invert dynamics equation
-    \item \textbf{Integrate state}: Use ODE solver for time evolution
-\end{enumerate}
-
-\textbf{Python class structure:}
+The linearized system can be implemented as:
 
 \begin{verbatim}
-class HybridRobotDynamics:
-    def __init__(self, l1, l2, m1, m2, I1, I2, g=9.81):
-        self.l1, self.l2 = l1, l2
-        self.m1, self.m2 = m1, m2
-        self.I1, self.I2 = I1, I2
-        self.g = g
+def system_matrix_A(q, dq, T):
+    # Compute Jacobians
+    J_q = velocity_jacobian(q)
+    J_rho = cable_geometry_jacobian(q)
     
-    def forward_kinematics(self, q):
-        x = self.l1*cos(q[0]) + self.l2*cos(q[0]+q[1])
-        y = self.l1*sin(q[0]) + self.l2*sin(q[0]+q[1])
-        return [x, y]
+    # Mass matrix and inverse
+    M = mass_matrix()
+    M_inv = inv(M)
     
-    def mass_matrix(self):
-        return [[self.I1+self.I2, self.I2],
-                [self.I2, self.I2]]
+    # Gravity terms
+    G = gravity_vector(q)
     
-    def gravity_torques(self, q):
-        g1 = (self.m1*self.l1/2 + self.m2*self.l1)*self.g*cos(q[0])
-        g1 += self.m2*self.l2/2*self.g*cos(q[0]+q[1])
-        g2 = self.m2*self.l2/2*self.g*cos(q[0]+q[1])
-        return [g1, g2]
+    # Construct A matrix blocks
+    A = zeros((6, 6))
+    A[0:2, 2:4] = eye(2)  # Position-velocity coupling
+    A[2:4, 0:2] = dJ_q/dt  # Acceleration kinematics
+    A[2:4, 2:4] = d2J_q/dt2  # Velocity kinematics
+    A[2:4, 4:6] = M_inv @ J_rho.T  # Tension coupling
+    A[4:6, 4:6] = diag([-k1, -k2])  # Tension dynamics
     
-    def state_derivative(self, x, u, T):
-        # Compute from state
-        q = self.q_from_position(x[0:2])
-        dq = self.dq_from_velocity(q, x[2:4])
-        
-        # Get system matrices
-        M = self.mass_matrix()
-        G = self.gravity_torques(q)
-        
-        # Solve: M*ddq = u + J_rho_T*T - G
-        ddq = solve(M, u + J_rho_T(q, T) - G)
-        
-        # Return derivatives
-        return concatenate([x[2:4], ddq, dT])
+    return A
+
+def state_derivative(x, t):
+    q = q_from_position(x[0:2])
+    dq = dq_from_velocity(x[2:4])
+    T = x[4:6]
+    
+    A = system_matrix_A(q, dq, T)
+    
+    return A @ x
 \end{verbatim}
 
-\textbf{Integration with scipy.integrate.odeint:}
+\subsubsection{Summary}
 
-\begin{verbatim}
-def dynamics_function(state, t, robot, controls):
-    return robot.state_derivative(state, controls(t))
+The complete linearized system matrix $[\mathbf{A}]$ captures:
 
-from scipy.integrate import odeint
+1. **Kinematic structure**: Forward and velocity kinematics relationships
+2. **Dynamic coupling**: Mass matrix, gravity, and inertial effects
+3. **Cable effects**: Jacobian transpose maps tensions to torques
+4. **Control inputs**: Tension dynamics and actuator response
+5. **Singularity indicators**: Matrix properties reveal singular configurations
 
-t = linspace(0, 10, 1000)
-initial_state = [0, 0, 0, 0, 5, 5]
-trajectory = odeint(dynamics_function, initial_state, t, 
-                   args=(robot, control_input))
-\end{verbatim}
-
-\subsubsection{7.17.14 Connection to Singularity Analysis}
-
-Near singularities, the system exhibits critical behavior:
-
-\begin{enumerate}
-    \item \textbf{Rank deficiency in Jacobian}: $\text{rank}(\mathbf{J}_{\rho}) < 2$
-    
-    \item \textbf{Large accelerations from small inputs}: 
-    \begin{equation}
-    \|\ddot{\mathbf{q}}\| = \left\|\mathbf{M}^{-1} \mathbf{J}_{\rho}^T \mathbf{T}\right\| \to \infty \text{ as } \det(\mathbf{J}_{\rho}) \to 0
-    \end{equation}
-    
-    \item \textbf{Unstable pole near singularity}: The linearized system matrix $\mathbf{A}$ has eigenvalues with large magnitude
-    
-    \item \textbf{Loss of controllability}: System cannot be controlled in all directions
-    
-    \begin{equation}
-    \text{rank}[\mathbf{B}, \mathbf{A}\mathbf{B}, \mathbf{A}^2\mathbf{B}, \ldots] < n \text{ at singularity}
-    \end{equation}
-\end{enumerate}
-
-This reinforces the importance of singularity detection and avoidance algorithms.
-
-\subsubsection{7.17.15 Summary: From Euler-Lagrange to State-Space}
-
-The derivation path is:
-
-\begin{enumerate}
-    \item **Define state vector**: $\mathbf{x} = [x_m, y_m, \dot{x}_m, \dot{y}_m, T_1, T_2]^T$
-    
-    \item **Write Lagrangian**: $L = T - V$ from kinetic and potential energies
-    
-    \item **Apply Euler-Lagrange**: $\frac{d}{dt}\frac{\partial L}{\partial \dot{\mathbf{q}}} - \frac{\partial L}{\partial \mathbf{q}} = \mathbf{Q}$
-    
-    \item **Get dynamics equations**: $\mathbf{M}(\mathbf{q})\ddot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \mathbf{J}_{\rho}^T\mathbf{T}$
-    
-    \item **Transform to Cartesian**: Convert joint accelerations to end-effector accelerations via kinematics
-    
-    \item **Add tension dynamics**: Include first-order models for cable tension control
-    
-    \item **Linearize for analysis**: Compute $\mathbf{A}$ matrix for stability and control analysis
-    
-    \item **Result**: Complete state-space system for simulation and control design
-\end{enumerate}
+This formulation provides the foundation for control design, trajectory planning, and singularity avoidance algorithms.
