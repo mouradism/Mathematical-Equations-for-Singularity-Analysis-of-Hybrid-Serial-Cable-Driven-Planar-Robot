@@ -1,0 +1,492 @@
+\section{Dynamic Analysis using Euler-Lagrange Formulation}
+
+This section derives the complete equations of motion for the hybrid serial-cable driven planar robot using the Euler-Lagrange method. This formulation provides a systematic approach to dynamics that naturally incorporates constraints and is particularly suited for systems with mixed actuators.
+
+\subsection{7.1 Euler-Lagrange Method Foundation}
+
+The Euler-Lagrange equation for a mechanical system with generalized coordinates $\mathbf{q}$ is:
+
+\begin{equation}
+\frac{d}{dt}\left(\frac{\partial L}{\partial \dot{\mathbf{q}}}\right) - \frac{\partial L}{\partial \mathbf{q}} = \mathbf{Q}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $L = T - V$ is the Lagrangian (Kinetic energy minus Potential energy)
+    \item $T$ is the total kinetic energy
+    \item $V$ is the total potential energy
+    \item $\mathbf{Q}$ are the generalized forces/torques not derivable from potential energy
+    \item $\mathbf{q} = [q_1, q_2]^T$ are the joint angles (generalized coordinates)
+\end{itemize}
+
+For our robot system, the generalized forces include:
+\begin{equation}
+\mathbf{Q} = \boldsymbol{\tau} + \mathbf{J}_{\rho}^T \mathbf{T}
+\end{equation}
+
+where $\boldsymbol{\tau} = [\tau_1, \tau_2]^T$ are motor torques and $\mathbf{J}_{\rho}^T \mathbf{T}$ represents the cable tension effects.
+
+\subsection{7.2 Kinetic Energy}
+
+The total kinetic energy consists of rotational components from the two links:
+
+\begin{equation}
+T = \frac{1}{2} I_1 \dot{q}_1^2 + \frac{1}{2} I_2 (\dot{q}_1 + \dot{q}_2)^2
+\end{equation}
+
+where $I_1$ and $I_2$ are the moments of inertia of links 1 and 2 about their respective pivot points.
+
+Expanding this:
+
+\begin{equation}
+T = \frac{1}{2} (I_1 + I_2) \dot{q}_1^2 + \frac{1}{2} I_2 \dot{q}_2^2 + I_2 \dot{q}_1 \dot{q}_2
+\end{equation}
+
+In matrix form:
+
+\begin{equation}
+T = \frac{1}{2} \dot{\mathbf{q}}^T \mathbf{M}(\mathbf{q}) \dot{\mathbf{q}}
+\end{equation}
+
+where the \textbf{Mass/Inertia Matrix} is:
+
+\begin{equation}
+\mathbf{M}(\mathbf{q}) = \begin{bmatrix}
+I_1 + I_2 & I_2 \\
+I_2 & I_2
+\end{bmatrix}
+\end{equation}
+
+Note: The mass matrix is constant for this planar 2-DOF arm with point masses at the joint axes.
+
+\subsection{7.3 Potential Energy}
+
+The potential energy comes from gravity acting on the links. Considering the center of mass of each link:
+
+\begin{equation}
+V = m_1 g h_1 + m_2 g h_2
+\end{equation}
+
+where $h_1$ and $h_2$ are the vertical heights of the centers of mass.
+
+For a 2-link planar arm in the vertical plane with angle $\alpha$ from horizontal:
+
+\begin{equation}
+h_1 = -\frac{l_1}{2} \sin(q_1)
+\end{equation}
+
+\begin{equation}
+h_2 = -l_1 \sin(q_1) - \frac{l_2}{2} \sin(q_1 + q_2)
+\end{equation}
+
+Therefore, the potential energy is:
+
+\begin{equation}
+V = -m_1 g \frac{l_1}{2} \sin(q_1) - m_2 g \left(l_1 \sin(q_1) + \frac{l_2}{2} \sin(q_1 + q_2)\right)
+\end{equation}
+
+Simplifying:
+
+\begin{equation}
+V = -\left(m_1 \frac{l_1}{2} + m_2 l_1\right) g \sin(q_1) - m_2 g \frac{l_2}{2} \sin(q_1 + q_2)
+\end{equation}
+
+\subsection{7.4 Lagrangian}
+
+The Lagrangian is:
+
+\begin{equation}
+L = T - V = \frac{1}{2} \dot{\mathbf{q}}^T \mathbf{M} \dot{\mathbf{q}} + \left(m_1 \frac{l_1}{2} + m_2 l_1\right) g \sin(q_1) + m_2 g \frac{l_2}{2} \sin(q_1 + q_2)
+\end{equation}
+
+\subsection{7.5 Partial Derivatives for Euler-Lagrange Equation}
+
+\subsubsection{7.5.1 Derivative with respect to velocities}
+
+\begin{equation}
+\frac{\partial L}{\partial \dot{q}_1} = (I_1 + I_2) \dot{q}_1 + I_2 \dot{q}_2
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial \dot{q}_2} = I_2 \dot{q}_1 + I_2 \dot{q}_2
+\end{equation}
+
+Taking time derivatives:
+
+\begin{equation}
+\frac{d}{dt}\left(\frac{\partial L}{\partial \dot{q}_1}\right) = (I_1 + I_2) \ddot{q}_1 + I_2 \ddot{q}_2
+\end{equation}
+
+\begin{equation}
+\frac{d}{dt}\left(\frac{\partial L}{\partial \dot{q}_2}\right) = I_2 \ddot{q}_1 + I_2 \ddot{q}_2
+\end{equation}
+
+\subsubsection{7.5.2 Derivatives with respect to positions}
+
+\begin{equation}
+\frac{\partial L}{\partial q_1} = \left(m_1 \frac{l_1}{2} + m_2 l_1\right) g \cos(q_1) + m_2 g \frac{l_2}{2} \cos(q_1 + q_2)
+\end{equation}
+
+\begin{equation}
+\frac{\partial L}{\partial q_2} = m_2 g \frac{l_2}{2} \cos(q_1 + q_2)
+\end{equation}
+
+\subsection{7.6 Equations of Motion}
+
+Applying the Euler-Lagrange equation for each degree of freedom:
+
+\textbf{For joint 1:}
+
+\begin{equation}
+(I_1 + I_2) \ddot{q}_1 + I_2 \ddot{q}_2 = \tau_1 + J_{\rho1,1} T_1 + J_{\rho1,2} T_2 - \left(m_1 \frac{l_1}{2} + m_2 l_1\right) g \cos(q_1) - m_2 g \frac{l_2}{2} \cos(q_1 + q_2)
+\end{equation}
+
+\textbf{For joint 2:}
+
+\begin{equation}
+I_2 \ddot{q}_1 + I_2 \ddot{q}_2 = \tau_2 + J_{\rho2,1} T_1 + J_{\rho2,2} T_2 - m_2 g \frac{l_2}{2} \cos(q_1 + q_2)
+\end{equation}
+
+where $J_{\rho i,j}$ are the elements of the Cable Geometry Jacobian $\mathbf{J}_{\rho}$ (see Section 5.2).
+
+\subsection{7.7 Matrix Form of Equations of Motion}
+
+The complete equations of motion can be written in matrix form:
+
+\begin{equation}
+\boxed{\mathbf{M}(\mathbf{q}) \ddot{\mathbf{q}} + \mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \mathbf{J}_{\rho}^T(\mathbf{q}) \mathbf{T}}
+\end{equation}
+
+where:
+
+\begin{itemize}
+    \item $\mathbf{M}(\mathbf{q})$ is the Mass/Inertia Matrix (symmetric, positive definite)
+    \item $\mathbf{C}(\mathbf{q}, \dot{\mathbf{q}})$ is the Centrifugal and Coriolis Matrix
+    \item $\mathbf{G}(\mathbf{q})$ is the Gravitational Torque Vector
+    \item $\boldsymbol{\tau}$ are the motor torques (actuator torques)
+    \item $\mathbf{J}_{\rho}^T \mathbf{T}$ are the torques from cable tensions
+\end{itemize}
+
+\subsection{7.8 Component Matrices}
+
+\subsubsection{7.8.1 Mass Matrix}
+
+\begin{equation}
+\mathbf{M}(\mathbf{q}) = \begin{bmatrix}
+I_1 + I_2 & I_2 \\
+I_2 & I_2
+\end{bmatrix}
+\end{equation}
+
+For this planar robot, the mass matrix is \textbf{independent of configuration} (constant). This simplification occurs because we assumed point masses at the pivots. For a more general case with distributed mass, $\mathbf{M}$ would depend on $\mathbf{q}$.
+
+\textbf{Properties:}
+\begin{itemize}
+    \item Symmetric: $\mathbf{M} = \mathbf{M}^T$
+    \item Positive definite: $\mathbf{x}^T \mathbf{M} \mathbf{x} > 0$ for all $\mathbf{x} \neq 0$
+    \item $\det(\mathbf{M}) = I_1 I_2 > 0$ (always invertible)
+\end{itemize}
+
+\subsubsection{7.8.2 Coriolis and Centrifugal Matrix}
+
+For a system where $\mathbf{M}$ is constant, the Coriolis and centrifugal terms vanish:
+
+\begin{equation}
+\mathbf{C}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}} = \mathbf{0}
+\end{equation}
+
+This is because:
+
+\begin{equation}
+\mathbf{C}_{ij} = \sum_{k} \left(\frac{\partial M_{ij}}{\partial q_k}\right) \dot{q}_k = 0 \text{ when } \mathbf{M} \text{ is constant}
+\end{equation}
+
+\textbf{Note:} If we include distributed mass effects, non-zero Coriolis terms would appear.
+
+\subsubsection{7.8.3 Gravitational Torque Vector}
+
+\begin{equation}
+\mathbf{G}(\mathbf{q}) = \begin{bmatrix}
+\left(m_1 \frac{l_1}{2} + m_2 l_1\right) g \cos(q_1) + m_2 g \frac{l_2}{2} \cos(q_1 + q_2) \\
+m_2 g \frac{l_2}{2} \cos(q_1 + q_2)
+\end{bmatrix}
+\end{equation}
+
+This represents the gravitational torques required to hold the arm in a given configuration.
+
+\subsection{7.9 Cable Tension Coupling}
+
+The cable tensions couple through the Cable Geometry Jacobian transpose:
+
+\begin{equation}
+\mathbf{J}_{\rho}^T(\mathbf{q}) \mathbf{T} = \begin{bmatrix}
+\frac{\partial \rho_1}{\partial q_1} T_1 + \frac{\partial \rho_2}{\partial q_1} T_2 \\
+\frac{\partial \rho_1}{\partial q_2} T_1 + \frac{\partial \rho_2}{\partial q_2} T_2
+\end{bmatrix}
+\end{equation}
+
+where the partial derivatives are computed from the cable length constraints (Section 5.2):
+
+\begin{equation}
+\frac{\partial \rho_i}{\partial q_j} = -\frac{1}{\rho_i} \frac{\partial}{\partial q_j} \left[(x_M + x_{A_i})^2 + (y_M + y_{A_i})^2\right]
+\end{equation}
+
+\subsection{7.10 Simplified Equations of Motion}
+
+For the case where Coriolis terms are negligible and assuming $I_1 \approx I_2 = I$:
+
+\begin{equation}
+\mathbf{M} \ddot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \mathbf{J}_{\rho}^T(\mathbf{q}) \mathbf{T}
+\end{equation}
+
+\textbf{Explicit form:}
+
+\begin{equation}
+\begin{bmatrix}
+2I & I \\
+I & I
+\end{bmatrix} \begin{bmatrix}
+\ddot{q}_1 \\
+\ddot{q}_2
+\end{bmatrix} + \begin{bmatrix}
+g_1(q_1, q_2) \\
+g_2(q_1, q_2)
+\end{bmatrix} = \begin{bmatrix}
+\tau_1 \\
+\tau_2
+\end{bmatrix} + \begin{bmatrix}
+J_{\rho 1,1} T_1 + J_{\rho 1,2} T_2 \\
+J_{\rho 2,1} T_1 + J_{\rho 2,2} T_2
+\end{bmatrix}
+\end{equation}
+
+\subsection{7.11 Inverse Dynamics}
+
+Given desired joint accelerations $\ddot{\mathbf{q}}_d$ and current configuration $\mathbf{q}$, $\dot{\mathbf{q}}$, we can solve for required torques:
+
+\begin{equation}
+\boldsymbol{\tau}_d = \mathbf{M}(\mathbf{q}) \ddot{\mathbf{q}}_d + \mathbf{G}(\mathbf{q}) - \mathbf{J}_{\rho}^T(\mathbf{q}) \mathbf{T}
+\end{equation}
+
+This is the \textbf{feedforward control law} that accounts for:
+\begin{itemize}
+    \item Inertial effects ($\mathbf{M} \ddot{\mathbf{q}}_d$)
+    \item Gravity compensation ($\mathbf{G}$)
+    \item Cable tension effects ($\mathbf{J}_{\rho}^T \mathbf{T}$)
+\end{itemize}
+
+\subsection{7.12 Singularity Effects on Dynamics}
+
+The Euler-Lagrange formulation reveals critical relationships between kinematics and dynamics:
+
+\subsubsection{7.12.1 Singularity Configuration}
+
+At singularity where $\det(\mathbf{J}_{\rho}) = 0$:
+
+\begin{enumerate}
+    \item \textbf{Velocity mapping is rank-deficient}: Not all Cartesian velocities are achievable
+    \item \textbf{Force mapping becomes problematic}: The inverse transpose relationship breaks down
+    \item \textbf{Cable tensions become indeterminate}: Multiple tension combinations produce same force
+\end{enumerate}
+
+\subsubsection{7.12.2 Near-Singularity Behavior}
+
+As $\det(\mathbf{J}_{\rho}) \to 0$:
+
+\begin{equation}
+\mathbf{J}_{\rho}^{-T} = \frac{1}{\det(\mathbf{J}_{\rho})} \text{adj}(\mathbf{J}_{\rho}) \to \infty
+\end{equation}
+
+This implies:
+\begin{itemize}
+    \item Small external forces require large cable tensions
+    \item Large external forces can produce infinitesimal motions
+    \item System becomes numerically unstable for control
+\end{itemize}
+
+\subsubsection{7.12.3 Acceleration Amplification}
+
+Near singularity, the relation:
+
+\begin{equation}
+\ddot{\mathbf{x}} = \mathbf{J}_{\rho}(\mathbf{q}) \ddot{\mathbf{q}} + \dot{\mathbf{J}}_{\rho}(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}}
+\end{equation}
+
+becomes ill-conditioned. Small joint accelerations can produce very large end-effector accelerations.
+
+\subsection{7.13 Numerical Example: Dynamic Simulation}
+
+Consider the following robot parameters:
+\begin{itemize}
+    \item $l_1 = 0.5$ m, $l_2 = 0.4$ m
+    \item $m_1 = 2$ kg, $m_2 = 1.5$ kg
+    \item $I_1 = 0.1$ kg·m², $I_2 = 0.08$ kg·m²
+    \item $g = 9.81$ m/s²
+\end{itemize}
+
+\textbf{Configuration:} $\mathbf{q} = [45°, 30°]^T$, $\dot{\mathbf{q}} = [0, 0]^T$
+
+\textbf{Step 1: Compute Mass Matrix}
+
+\begin{equation}
+\mathbf{M} = \begin{bmatrix}
+0.1 + 0.08 & 0.08 \\
+0.08 & 0.08
+\end{bmatrix} = \begin{bmatrix}
+0.18 & 0.08 \\
+0.08 & 0.08
+\end{bmatrix}
+\end{equation}
+
+\textbf{Step 2: Compute Gravitational Torques}
+
+\begin{align}
+g_1 &= (2 \times 0.25 + 1.5 \times 0.5) \times 9.81 \times \cos(45°) + 1.5 \times 9.81 \times 0.2 \times \cos(75°) \\
+&= 2.2 \times 9.81 \times 0.707 + 2.94 \times 0.259 \\
+&= 15.2 + 0.76 = 15.96 \text{ N·m}
+\end{align}
+
+\begin{align}
+g_2 &= 1.5 \times 9.81 \times 0.2 \times \cos(75°) \\
+&= 0.76 \text{ N·m}
+\end{align}
+
+\textbf{Step 3: Compute Cable Geometry Jacobian}
+
+From Section 5.2, for cable anchors at $(±L, 0)$ with $L = 0.5$ m:
+
+\begin{equation}
+\mathbf{J}_{\rho} = \begin{bmatrix}
+-\frac{x_M + L}{\rho_1} & 0 \\
+-\frac{x_M - L}{\rho_2} & 0 \\
+-\frac{y_M}{\rho_1} & -\frac{y_M}{\rho_2}
+\end{bmatrix}
+\end{equation}
+
+For $q_1 = 45°$, $q_2 = 30°$:
+$x_M = 0.5\cos(45°) + 0.4\cos(75°) = 0.354 + 0.103 = 0.457$ m
+$y_M = 0.5\sin(45°) + 0.4\sin(75°) = 0.354 + 0.386 = 0.740$ m
+
+Cable lengths:
+$\rho_1 = \sqrt{(0.457+0.5)^2 + 0.740^2} = \sqrt{0.910 + 0.548} = 1.204$ m
+$\rho_2 = \sqrt{(0.457-0.5)^2 + 0.740^2} = \sqrt{0.0018 + 0.548} = 0.742$ m
+
+\textbf{Step 4: Applied Cable Tensions}
+
+Suppose $\mathbf{T} = [15, 12]^T$ N
+
+\textbf{Step 5: Solve for Accelerations}
+
+Given desired feedforward torques (e.g., $\boldsymbol{\tau} = [5, 3]^T$ N·m):
+
+\begin{equation}
+\ddot{\mathbf{q}} = \mathbf{M}^{-1} \left( \boldsymbol{\tau} + \mathbf{J}_{\rho}^T \mathbf{T} - \mathbf{G}(\mathbf{q}) \right)
+\end{equation}
+
+\begin{equation}
+\mathbf{M}^{-1} = \begin{bmatrix}
+0.18 & 0.08 \\
+0.08 & 0.08
+\end{bmatrix}^{-1} = \begin{bmatrix}
+14.29 & -14.29 \\
+-14.29 & 32.14
+\end{bmatrix}
+\end{equation}
+
+Computing $\mathbf{J}_{\rho}^T \mathbf{T}$ and solving yields the joint accelerations.
+
+\textbf{Key Observations:}
+\begin{itemize}
+    \item Near singularity ($\det(\mathbf{J}_{\rho}) \approx 0$), small changes in $\mathbf{T}$ cause large changes in $\ddot{\mathbf{q}}$
+    \item Gravity dominates for certain configurations
+    \item Cable tensions can either assist or resist motion depending on geometry
+\end{itemize}
+
+\subsection{7.14 Connection to Singularity Analysis}
+
+The Euler-Lagrange formulation directly connects to singularity analysis:
+
+\begin{enumerate}
+    \item \textbf{Singularity Detection}: Monitor $\det(\mathbf{J}_{\rho})$ and $\det(\mathbf{M})$ during motion
+    
+    \item \textbf{Control Near Singularities}: 
+    \begin{itemize}
+        \item Use damping terms to stabilize: $\mathbf{M} \ddot{\mathbf{q}} + \mathbf{B} \dot{\mathbf{q}} + \mathbf{G} = \mathbf{Q}$
+        \item Implement singular value decomposition (SVD) based controllers
+        \item Limit cable tensions in singular regions
+    \end{itemize}
+    
+    \item \textbf{Trajectory Planning}: Avoid or plan smooth passages through singularities
+    \begin{itemize}
+        \item Pre-compute singular surfaces in the configuration space
+        \item Plan trajectories that maintain distance from singularities
+        \item Use null-space motions for singularity avoidance
+    \end{itemize}
+    
+    \item \textbf{Force Control}: Understand amplification effects
+    \begin{itemize}
+        \item Near singularity: $\mathbf{F}_{ext} = \mathbf{J}_{\rho}^{-T} \mathbf{T}$ becomes ill-conditioned
+        \item Apply force limits to prevent damage
+        \item Monitor condition number $\kappa(\mathbf{J}_{\rho})$ continuously
+    \end{itemize}
+\end{enumerate}
+
+\subsection{7.15 Advanced Topics}
+
+\subsubsection{7.15.1 Damping and Friction}
+
+In practice, joint friction and cable friction must be included:
+
+\begin{equation}
+\mathbf{M} \ddot{\mathbf{q}} + \mathbf{B} \dot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \mathbf{J}_{\rho}^T \mathbf{T}
+\end{equation}
+
+where $\mathbf{B}$ is the damping matrix. This term is crucial near singularities where it provides stabilization.
+
+\subsubsection{7.15.2 Constraint Forces}
+
+When the robot interacts with the environment (contact), constraint forces must be included:
+
+\begin{equation}
+\mathbf{M} \ddot{\mathbf{q}} + \mathbf{B} \dot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \mathbf{J}_{\rho}^T \mathbf{T} + \mathbf{J}_c^T \mathbf{F}_c
+\end{equation}
+
+where $\mathbf{J}_c$ is the contact Jacobian and $\mathbf{F}_c$ is the contact force vector.
+
+\subsubsection{7.15.3 Elastic Cables}
+
+For compliant cables with stiffness $k_c$:
+
+\begin{equation}
+\dot{T}_i = k_c (\dot{\rho}_i - v_i)
+\end{equation}
+
+This introduces additional dynamics and can affect singularity behavior through cable elongation.
+
+\subsubsection{7.15.4 Nonlinear Control}
+
+Feedback linearization controller:
+
+\begin{equation}
+\boldsymbol{\tau} + \mathbf{J}_{\rho}^T \mathbf{T} = \mathbf{M}(\mathbf{q}) \mathbf{u} + \mathbf{G}(\mathbf{q})
+\end{equation}
+
+where $\mathbf{u}$ is the linearized control input. This eliminates gravity and inertial coupling but requires accurate dynamic model.
+
+\subsection{7.16 Summary: Euler-Lagrange Dynamics}
+
+The Euler-Lagrange formulation for the hybrid serial-cable robot provides:
+
+\begin{enumerate}
+    \item \textbf{Complete dynamic model}: $\mathbf{M} \ddot{\mathbf{q}} + \mathbf{C} \dot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \mathbf{J}_{\rho}^T \mathbf{T}$
+    
+    \item \textbf{Clear physical interpretation}: Each term has mechanical meaning
+    
+    \item \textbf{Systematic derivation}: From energy principles, not ad-hoc assumptions
+    
+    \item \textbf{Integration with singularity analysis}: Direct connection between kinematic singularities and dynamic instability
+    
+    \item \textbf{Foundation for control design}: Enables model-based controllers and trajectory planning
+    
+    \item \textbf{Predictive capability}: Simulate system behavior including singular configurations
+\end{enumerate}
