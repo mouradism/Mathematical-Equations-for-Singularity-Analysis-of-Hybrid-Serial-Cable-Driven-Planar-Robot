@@ -1002,6 +1002,93 @@ Y_A - T_1 \cos(q_1) - m_2 g = 0 \\
     \textbf{Physical Interpretation:} The moment balance determines how cable forces $X_A, Y_A$ must be oriented to counteract gravity on link 2. This constrains the cable geometry and explains why certain configurations become singular.
 \end{itemize}
 
+\subparagraph{Combined Matrix Form of Equilibrium Equations}
+
+To provide a compact and unified representation, we combine all six equilibrium equations (three from link 1, three from link 2) in matrix form. This reveals the structural coupling between forces, configuration, and gravity.
+
+\textbf{State Vector Definition:}
+
+Define the state vector collecting all unknowns:
+
+\begin{equation}
+\mathbf{s} = \begin{bmatrix} X_m \\ Y_m \\ X_A \\ Y_A \\ T_1 \\ T_2 \end{bmatrix}
+\end{equation}
+
+where $X_m, Y_m$ are end-effector forces from the first link's perspective, $X_A, Y_A$ are forces at the attachment point, and $T_1, T_2$ are cable tensions.
+
+\textbf{Gravity and Configuration Vector:}
+
+The right-hand side captures gravitational loads and configuration-dependent terms:
+
+\begin{equation}
+\mathbf{g}_{\text{config}} = \begin{bmatrix} 0 \\ m_1 g \\ \frac{1}{2} m_1 g l_1 \cos q_1 \\ 0 \\ m_2 g \\ \frac{1}{2} m_2 g l_2 \cos(q_1 + q_2) \end{bmatrix} \tag{7}
+\end{equation}
+
+\textbf{System Matrix:}
+
+The complete equilibrium system can be written as:
+
+\begin{equation}
+[A] \mathbf{s} = \mathbf{g}_{\text{config}} \tag{8}
+\end{equation}
+
+where the system matrix $[A]$ is:
+
+\begin{equation}
+[A] = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 0 & -1 & 0 & -\cos\alpha_1 & -\cos\alpha_2 \\
+0 & 0 & 0 & -1 & \sin\alpha_1 & \sin\alpha_2 \\
+0 & 0 & 0 & -1 & -\sin(q_2) & 0 \\
+l_1\cos(q_1) & -l_1\sin(q_1) & 0 & 0 & 0 & 0
+\end{bmatrix}
+\end{equation}
+
+\textbf{Matrix Structure Explanation:}
+
+\begin{itemize}
+    \item \textbf{Rows 1-2:} Link 1 force balance
+    \begin{itemize}
+        \item Row 1: $X_m = 0$ (horizontal force from link 1)
+        \item Row 2: $Y_m = 0$ (vertical force from link 1)
+    \end{itemize}
+    
+    \item \textbf{Row 3:} Link 1 moment balance
+    \begin{itemize}
+        \item Couples horizontal and vertical reaction forces through moment arm coefficients
+        \item Configuration-dependent through $\cos(q_1)$ terms
+    \end{itemize}
+    
+    \item \textbf{Rows 4-5:} Link 2 force balance
+    \begin{itemize}
+        \item Row 4: $X_A - T_1 \sin(q_1) = 0$ (horizontal equilibrium at joint 2)
+        \item Row 5: $Y_A - T_1 \cos(q_1) - m_2 g = 0$ (vertical equilibrium at joint 2)
+    \end{itemize}
+    
+    \item \textbf{Row 6:} Link 2 moment balance
+    \begin{itemize}
+        \item Couples forces at attachment point through moment arms $l_2\cos(q_2)$ and $-l_2\sin(q_2)$
+        \item Configuration-dependent through both $q_1$ and $q_2$
+    \end{itemize}
+\end{itemize}
+
+\textbf{Solution Strategy:}
+
+For a given configuration $(\mathbf{q}, \alpha_1, \alpha_2)$, the equilibrium conditions are solved as:
+
+\begin{equation}
+\mathbf{s} = [A]^{-1} \mathbf{g}_{\text{config}}
+\end{equation}
+
+The existence and uniqueness of solution depends on $\det([A])$:
+
+\begin{itemize}
+    \item $\det([A]) \neq 0$: Unique solution exists - configuration is non-singular
+    \item $\det([A]) = 0$: Matrix is singular - equilibrium may have multiple solutions or no solution (singularity)
+    \item $\det([A]) \to 0$: Near-singular configuration - system is ill-conditioned
+\end{itemize}
+
 \paragraph{Summary: Wrench-Based Equilibrium Analysis}
 
 The three equations at each joint form a complete equilibrium description:
