@@ -978,22 +978,34 @@ This shows the vertical force at point $A$ must balance:
 
 $$\boxed{Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2)} \quad \text{[Equation 412b - Corrected]}$$
 
-\textbf{Step 3: Apply moment balance about joint at Link 2}
+\textbf{Step 3: Apply moment balance about joint A}
 
-Taking moments about the attachment point of link 2:
-$$\sum M = 0$$
+Taking moments about joint A (connection between links 1 and 2):
+$$\sum M_A = 0$$
 
 Moment contributions:
 \begin{itemize}
-    \item Gravitational moment: $m_2 g \cdot \frac{l_2}{2} \cos(q_2)$
-    \item Moment from forces $X_A, Y_A$ at distance $l_2$
+    \item \textbf{Gravitational moment}: $m_2 g \cdot \frac{l_2}{2} \cos(q_2)$ (weight acts at center of link 2)
+    \item \textbf{Cable force moments}: Cable forces $T_1, T_2$ act at end-effector M, distance $l_2$ from joint A
+    \item \textbf{Joint reaction forces}: $X_A, Y_A$ act at joint A (zero moment arm)
 \end{itemize}
 
-Similar to Link 1 analysis, the moment equation becomes:
-$$-l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A = m_2 g \cdot \frac{l_2}{2} \cos(q_2)$$
+The cable forces create moments about joint A:
+\begin{itemize}
+    \item $T_1$ horizontal component: $T_1 \cos(\alpha_1) \cdot l_2 \sin(q_2)$ 
+    \item $T_1$ vertical component: $T_1 \sin(\alpha_1) \cdot l_2 \cos(q_2)$
+    \item $T_2$ horizontal component: $T_2 \cos(\alpha_2) \cdot l_2 \sin(q_2)$
+    \item $T_2$ vertical component: $T_2 \sin(\alpha_2) \cdot l_2 \cos(q_2)$
+\end{itemize}
 
-Simplifying:
-$$\boxed{-l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A = \frac{1}{2} m_2 g l_2 \cos(q_2)} \quad \text{[Equation 412c]}$$
+The complete moment equation becomes:
+$$T_1 \cos(\alpha_1) \cdot l_2 \sin(q_2) + T_1 \sin(\alpha_1) \cdot l_2 \cos(q_2) + T_2 \cos(\alpha_2) \cdot l_2 \sin(q_2) + T_2 \sin(\alpha_2) \cdot l_2 \cos(q_2) = m_2 g \cdot \frac{l_2}{2} \cos(q_2)$$
+
+Factoring out $l_2$:
+$$\boxed{l_2[T_1(\cos(\alpha_1) \sin(q_2) + \sin(\alpha_1) \cos(q_2)) + T_2(\cos(\alpha_2) \sin(q_2) + \sin(\alpha_2) \cos(q_2))] = \frac{1}{2} m_2 g l_2 \cos(q_2)} \quad \text{[Equation 412c - Corrected]}$$
+
+Using trigonometric identity $\cos(A)\sin(B) + \sin(A)\cos(B) = \sin(A+B)$:
+$$\boxed{l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)} \quad \text{[Equation 412c - Final]}$$
 
 \subparagraph{General Equilibrium Framework}
 
@@ -1011,7 +1023,7 @@ Y_{r1} + Y_m - m_1 g &= 0 && \text{[Vertical equilibrium]} \\
 \begin{align}
 X_A &= -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2) && \text{[Equation 412a]} \\
 Y_A &= m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) && \text{[Equation 412b]} \\
--l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A &= \frac{1}{2} m_2 g l_2 \cos(q_2) && \text{[Equation 412c]}
+l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] &= \frac{1}{2} m_2 g l_2 \cos(q_2) && \text{[Equation 412c]}
 \end{align}
 
 These equations show the direct relationship between cable tensions $(T_1, T_2)$ and internal force distribution.
@@ -1075,7 +1087,7 @@ At the end-effector attachment point $A$ where cable forces are applied to link 
 \begin{cases}
 X_A = -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2) \\
 Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) \\
--l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A = \frac{1}{2} m_2 g l_2 \cos(q_2)
+l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)
 \end{cases}
 \label{eq:joint_A_equilibrium}
 \end{equation}
@@ -1096,14 +1108,15 @@ Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) \\
     \end{itemize}
     Both cables contribute to supporting the gravitational load, with their contributions depending on the cable geometry angles $\alpha_1, \alpha_2$.
     
-    \item \textbf{Equation (412c) - Moment balance about joint at link 2:}
-    $$-l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A = \frac{1}{2} m_2 g l_2 \cos(q_2)$$
+    \item \textbf{Equation (412c) - Moment balance about joint A:}
+    $$l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)$$
     
-    Similar structure to link 1 equilibrium but applied to link 2:
+    This corrected moment balance properly accounts for cable force contributions:
     \begin{itemize}
-        \item Moment arm depends on link 2 angle: $q_2$
-        \item Moment is created by forces $X_A, Y_A$ at distance $l_2$ from joint
-        \item Right side is gravitational moment at link 2's center (distance $\frac{l_2}{2}$)
+        \item \textbf{Left side}: Moments from cable forces $T_1, T_2$ acting at end-effector M
+        \item Cable angle terms: $(\alpha_i + q_2)$ represent total angle from horizontal to cable direction
+        \item \textbf{Right side}: Gravitational moment about joint A from link 2's center of mass
+        \item Joint reaction forces $X_A, Y_A$ create no moment (zero moment arm about joint A)
     \end{itemize}
     
     \textbf{Physical Interpretation:} The moment balance determines how cable forces $X_A, Y_A$ must be oriented to counteract gravity on link 2. This constrains the cable geometry and explains why certain configurations become singular.
@@ -1279,9 +1292,9 @@ This approach:
     
     \item \textbf{Row 6:} Link 2 moment balance
     \begin{equation}
-    -l_2\sin(q_2) X_A + l_2\cos(q_2) Y_A = \frac{1}{2} m_2 g l_2 \cos(q_2)
+    l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)
     \end{equation}
-    Moment equilibrium about joint 2 due to forces at attachment point.
+    Moment equilibrium about joint A due to cable forces acting at end-effector M.
     
     \item \textbf{Rows 7-8:} Direct Cable-Gravity Equilibrium (\textbf{$\tau$ eliminated})
     \begin{align}
@@ -1376,51 +1389,45 @@ At singular configurations where $\det(\mathbf{J}_{\rho}) = 0$, these equations 
 
 \subparagraph{Solving for Cable Tensions: T1 and T2}
 
-\textbf{Step 1: Analytical Derivation of T1 from Link 2 Equilibrium}
+\textbf{Step 1: Two-Cable System Analysis}
 
-From equations (412a)–(412c), we can extract $T_1$ analytically using the moment balance equation. Starting with:
-
-\begin{itemize}
-    \item Horizontal force (412a): $X_A = T_1 \sin(q_1)$
-    \item Vertical force (412b): $Y_A = T_1 \cos(q_1) + m_2 g$
-    \item Moment balance (412c): $-l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A = \frac{1}{2} m_2 g l_2 \cos(q_2)$
-\end{itemize}
-
-Substitute $X_A$ and $Y_A$ into the moment equation:
-
-$$-l_2 \sin(q_2) [T_1 \sin(q_1)] + l_2 \cos(q_2) [T_1 \cos(q_1) + m_2 g] = \frac{1}{2} m_2 g l_2 \cos(q_2)$$
-
-Factor out $l_2$ and $T_1$:
-
-$$l_2 T_1 [\cos(q_2)\cos(q_1) - \sin(q_2)\sin(q_1)] + l_2 \cos(q_2) m_2 g = \frac{1}{2} m_2 g l_2 \cos(q_2)$$
-
-Using the cosine addition formula $\cos(q_2)\cos(q_1) - \sin(q_2)\sin(q_1) = \cos(q_1 + q_2)$:
-
-$$l_2 T_1 \cos(q_1 + q_2) + l_2 m_2 g \cos(q_2) = \frac{1}{2} m_2 g l_2 \cos(q_2)$$
-
-Rearrange to isolate $T_1$:
-
-$$l_2 T_1 \cos(q_1 + q_2) = \frac{1}{2} m_2 g l_2 \cos(q_2) - l_2 m_2 g \cos(q_2)$$
-
-$$l_2 T_1 \cos(q_1 + q_2) = -\frac{1}{2} m_2 g l_2 \cos(q_2)$$
-
-Divide both sides by $l_2 \cos(q_1 + q_2)$:
-
-\begin{equation}
-\boxed{T_1 = -\frac{m_2 g \cos(q_2)}{2\cos(q_1 + q_2)}}
-\label{eq:T1_closed_form}
-\end{equation}
-
-\textbf{Physical Interpretation of T1:}
+From the corrected equations (412a)–(412c), we have a system with **two cable tensions** $T_1$ and $T_2$:
 
 \begin{itemize}
-    \item The minus sign indicates tension direction convention in the equilibrium equations.
-    \item As $\cos(q_1 + q_2) \to 0$ (when $q_1 + q_2 \approx \pm 90°$), $T_1 \to \infty$ — a geometric singularity where link 2 approaches vertical (perpendicular to the moment arm).
-    \item At this singularity, cable tension must become infinite to balance any finite gravitational moment — the system loses ability to produce rotational equilibrium.
-    \item If $\cos(q_2) = 0$ (link 2 vertical), the numerator vanishes and $T_1 = 0$, meaning no cable tension needed from this geometry alone.
+    \item Horizontal force (412a): $X_A = -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2)$
+    \item Vertical force (412b): $Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2)$
+    \item Moment balance (412c): $l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)$
 \end{itemize}
 
-\textbf{Step 1b: Analytical Derivation of T2 Using Matrix Inversion}
+**Key Observation**: This is a **two-cable system** with two unknowns $(T_1, T_2)$ and three equations. The system is **overconstrained** unless we use additional constraints or solve it as an optimization problem.
+
+**Simplified moment balance** (dividing by $l_2$):
+
+$$T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2) = \frac{1}{2} m_2 g \cos(q_2)$$
+
+\textbf{Step 2: Matrix System Solution for Two-Cable Tensions}
+
+For the **two-cable system**, we cannot derive individual tensions analytically without additional constraints. Instead, we solve the system using the **cable constraint equations** and **force balance**.
+
+**Method 1: Cable-Length Constraint Approach**
+
+The cable tensions $T_1$ and $T_2$ must satisfy both:
+1. **Force equilibrium** (equations 412a, 412b)  
+2. **Cable length constraints** (cables cannot push)
+3. **Moment equilibrium** (equation 412c)
+
+**Matrix formulation**:
+$$\begin{bmatrix}
+-\cos(\alpha_1) & -\cos(\alpha_2) \\
+-\sin(\alpha_1) & -\sin(\alpha_2) \\
+\sin(\alpha_1 + q_2) & \sin(\alpha_2 + q_2)
+\end{bmatrix} \begin{bmatrix} T_1 \\ T_2 \end{bmatrix} = \begin{bmatrix} X_A \\ Y_A - m_2 g \\ \frac{m_2 g \cos(q_2)}{2 l_2} \end{bmatrix}$$
+
+**Key Insight**: This is an **overconstrained system** (3 equations, 2 unknowns). For a solution to exist:
+- The system must be **consistent** (no contradictory requirements)
+- Cable angles $\alpha_1, \alpha_2$ must be **non-singular**: $\sin(\alpha_1 - \alpha_2) \neq 0$
+
+**Method 2: Two-Cable Force Distribution**
 
 The most reliable approach to find $T_2$ is through the complete equilibrium system. Since both cables contribute to torques at both joints, we must solve the coupled system:
 
@@ -1432,30 +1439,34 @@ where:
     \item $\mathbf{G}(\mathbf{q}) = [g_1(q_1, q_2), g_2(q_1, q_2)]^T$ (gravity torques at joints 1 and 2)
 \end{itemize}
 
-\textbf{Method 1: Direct Matrix Solution}
+For the two-cable system, we can solve for tensions using **force constraint optimization** or **numerical methods**.
 
-From the $2 \times 2$ system:
+**Method A: Minimize Cable Force Norm**
 
-$$\begin{bmatrix} J_{11}^T & J_{12}^T \\ J_{21}^T & J_{22}^T \end{bmatrix} \begin{bmatrix} T_1 \\ T_2 \end{bmatrix} = \begin{bmatrix} g_1 \\ g_2 \end{bmatrix}$$
+If the system is underdetermined, we can find the minimum-norm solution:
 
-Using Cramer's rule, $T_2$ is:
+$$\text{minimize: } \|T_1\|^2 + \|T_2\|^2$$
+$$\text{subject to: } \mathbf{J}_{\rho}^T \mathbf{T} = \mathbf{g}_{\rho}$$
+
+The **Moore-Penrose pseudoinverse** solution is:
 
 \begin{equation}
-\boxed{T_2 = \frac{\det\begin{bmatrix} J_{11}^T & g_1 \\ J_{21}^T & g_2 \end{bmatrix}}{\det(\mathbf{J}_{\rho}^T)} = \frac{J_{11}^T g_2 - J_{21}^T g_1}{\det(\mathbf{J}_{\rho}^T)}}
-\label{eq:T2_cramers_rule}
+\boxed{\begin{bmatrix} T_1 \\ T_2 \end{bmatrix} = (\mathbf{J}_{\rho}^T)^{\dagger} \mathbf{g}_{\rho}}
+\label{eq:cable_tensions_pseudoinverse}
 \end{equation}
 
-\textbf{Method 2: Substitution Using Known T1}
+**Method B: Cable Force Distribution**
 
-Alternatively, substitute the known $T_1$ from equation \eqref{eq:T1_closed_form} into the first equilibrium equation:
+Using the **force balance equations** (412a, 412b) with the **moment constraint** (412c):
 
-$$J_{11}^T T_1 + J_{12}^T T_2 = g_1$$
+From horizontal equilibrium: $T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2) = -X_A$
+From vertical equilibrium: $T_1 \sin(\alpha_1) + T_2 \sin(\alpha_2) = -Y_A + m_2 g$
 
-Solve for $T_2$:
+**Solution strategy**: Choose one tension (e.g., $T_1$) and solve for $T_2$:
 
 \begin{equation}
-\boxed{T_2 = \frac{g_1 - J_{11}^T T_1}{J_{12}^T} = \frac{g_1 + J_{11}^T \frac{m_2 g \cos(q_2)}{2\cos(q_1 + q_2)}}{J_{12}^T}}
-\label{eq:T2_substitution_method}
+\boxed{T_2 = \frac{-X_A - T_1 \cos(\alpha_1)}{\cos(\alpha_2)}}
+\label{eq:T2_horizontal_constraint}
 \end{equation}
 
 \textbf{System Verification Using Determinant of Matrix A}
@@ -1534,11 +1545,11 @@ For a valid and consistent solution:
     \item \textbf{Cable tension positivity}: Both $T_1 \geq 0$ and $T_2 \geq 0$
     
     \item \textbf{Force equilibrium verification}:
-    $$X_A = T_1 \sin(q_1) \quad \text{(from equation 412a)}$$
-    $$Y_A = T_1 \cos(q_1) + m_2 g \quad \text{(from equation 412b)}$$
+    $$X_A = -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2) \quad \text{(from equation 412a)}$$
+    $$Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) \quad \text{(from equation 412b)}$$
     
     \item \textbf{Moment equilibrium verification}:
-    $$-l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A = \frac{1}{2} m_2 g l_2 \cos(q_2) \quad \text{(equation 412c)}$$
+    $$l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2) \quad \text{(equation 412c)}$$
 \end{enumerate}
 
 \textbf{Step 4: Complete System Verification Algorithm}
@@ -1798,12 +1809,21 @@ End-effector position:
 $$x_M = 1.0 \cos(30°) + 0.8 \cos(75°) = 0.866 + 0.207 = 1.073 \text{ m}$$
 $$y_M = 1.0 \sin(30°) + 0.8 \sin(75°) = 0.500 + 0.773 = 1.273 \text{ m}$$
 
-From equation \eqref{eq:T1_closed_form}:
-$$T_1 = -\frac{1.5 \times 9.81 \times \cos(45°)}{2 \times \cos(75°)} = -\frac{14.715 \times 0.707}{2 \times 0.259} = -\frac{10.407}{0.518} \approx -20.1 \text{ N}$$
+For the **two-cable system**, we must solve the full force balance numerically:
 
-The negative value indicates tension direction — after accounting for sign convention, $|T_1| \approx 20.1$ N.
+**Step 1:** Calculate cable angles from end-effector to anchors:
+$$\alpha_1 = \arctan\left(\frac{y_M - 0}{x_M - (-L)}\right), \quad \alpha_2 = \arctan\left(\frac{y_M - 0}{x_M - L}\right)$$
 
-Computing $T_2$ requires full Jacobian inversion (dependent on cable anchor locations and end-effector position). In practice, use computational tools to:
+**Step 2:** Solve the coupled system:
+$$\begin{bmatrix}
+-\cos(\alpha_1) & -\cos(\alpha_2) \\
+-\sin(\alpha_1) & -\sin(\alpha_2)
+\end{bmatrix} \begin{bmatrix} T_1 \\ T_2 \end{bmatrix} = \begin{bmatrix} X_A \\ Y_A - m_2 g \end{bmatrix}$$
+
+**Step 3:** Verify moment constraint (equation 412c):
+$$l_2[T_1\sin(\alpha_1+q_2) + T_2\sin(\alpha_2+q_2)] = \frac{1}{2}m_2 g l_2 \cos(q_2)$$
+
+In practice, use computational tools to:
 \begin{enumerate}
     \item Assemble $\mathbf{J}_{\rho}^T$ using cable vectors and lever arms
     \item Invert to get $\mathbf{T} = (\mathbf{J}_{\rho}^T)^{-1} \mathbf{G}(\mathbf{q})$
@@ -1850,7 +1870,7 @@ This wrench analysis demonstrates why singularities are critical failure points 
 
 \textbf{VERIFIED Correct Elements:}
 \begin{enumerate}
-    \item \textbf{$T_1$ analytical derivation}: $T_1 = -\frac{m_2 g \cos(q_2)}{2\cos(q_1 + q_2)}$ is mathematically sound
+    \item \textbf{Two-cable force distribution}: The corrected analysis properly accounts for both cable tensions in equilibrium
     \item \textbf{Singularity analysis}: $\det(\mathbf{J}_{\rho}^T) = \sin(\alpha_1 - \alpha_2)$ correctly identifies parallel cable configurations as singular
     \item \textbf{Physical interpretations}: Explanations of moment balance and force equilibrium are accurate
     \item \textbf{General methodology}: The approach using free-body diagrams and equilibrium equations is appropriate
