@@ -1,0 +1,97 @@
+\begin{tikzpicture}[>=Stealth, scale=1.5]
+
+% Define colors
+\definecolor{linkcolor}{RGB}{70,130,180}
+\definecolor{jointcolor}{RGB}{220,20,60}  
+\definecolor{reactioncolor}{RGB}{255,140,0}
+\definecolor{weightcolor}{RGB}{34,139,34}
+\definecolor{linkforcecolor}{RGB}{148,0,211}
+
+% Link 1 geometry
+\coordinate (O) at (0,0);  % Base joint O (fixed base)
+\coordinate (A) at (3,1.5);  % Joint A (connection to Link 2)
+\coordinate (G1) at (1.5,0.75);  % Center of gravity of Link 1
+
+% Draw Link 1
+\draw[very thick, linkcolor] (O) -- (A);
+\filldraw[linkcolor!30] (O) circle (0.1);
+\filldraw[linkcolor!30] (A) circle (0.1);
+
+% Draw base (ground symbol)
+\draw[very thick] ([shift={(-0.3,-0.2)}] O) -- ([shift={(0.3,-0.2)}] O);
+\draw[thick] ([shift={(-0.2,-0.2)}] O) -- ([shift={(-0.2,-0.35)}] O);
+\draw[thick] ([shift={(-0.1,-0.2)}] O) -- ([shift={(-0.1,-0.35)}] O);
+\draw[thick] ([shift={(0,-0.2)}] O) -- ([shift={(0,-0.35)}] O);
+\draw[thick] ([shift={(0.1,-0.2)}] O) -- ([shift={(0.1,-0.35)}] O);
+\draw[thick] ([shift={(0.2,-0.2)}] O) -- ([shift={(0.2,-0.35)}] O);
+
+% Labels for points
+\node[below left] at (O) {\Large $O$};
+\node[above right] at (A) {\Large $A$};
+\node[below] at (G1) {\Large $G_1$};
+
+% Link 1 label
+\node[above, linkcolor] at (1.5,1.2) {\Large \textbf{Link 1}};
+
+% Coordinate system
+\draw[->] ([shift={(-0.7,-0.7)}] O) -- ([shift={(-0.7,0.3)}] O) node[left] {$y$};
+\draw[->] ([shift={(-0.7,-0.7)}] O) -- ([shift={(0.3,-0.7)}] O) node[below] {$x$};
+
+% === FORCES ACTING ON LINK 1 ===
+
+% 1. Weight of Link 1 (at center of gravity)
+\draw[->, very thick, weightcolor] (G1) -- +(0,-1.2) node[below] {\Large $m_1 g$};
+\node[weightcolor, right] at ([shift={(0.2,-0.6)}] G1) {\Large Weight};
+
+% 2. Reaction forces from base at joint O
+\draw[->, very thick, reactioncolor] (O) -- +(1.2,0) node[above] {\Large $X_{O1}$};
+\draw[->, very thick, reactioncolor] (O) -- +(0,1.2) node[left] {\Large $Y_{O1}$};
+\node[reactioncolor, above right] at ([shift={(0.6,0.6)}] O) {\Large Ground reaction};
+\node[reactioncolor, above right] at ([shift={(0.6,0.4)}] O) {\Large on Link 1};
+
+% 3. Joint reaction forces at A (what Link 2 exerts ON Link 1)
+\draw[->, very thick, jointcolor] (A) -- +(-1,0) node[above] {\Large $-X_A$};
+\draw[->, very thick, jointcolor] (A) -- +(0,-1) node[right] {\Large $-Y_A$};
+\node[jointcolor, below left] at ([shift={(-0.5,-0.5)}] A) {\Large Joint reaction};
+\node[jointcolor, below left] at ([shift={(-0.5,-0.7)}] A) {\Large from Link 2};
+
+% 4. Show the transmitted cable forces (represented in X_m, Y_m)
+\coordinate (CableRef) at ([shift={(1.5,1)}] A);
+\draw[dashed, gray] (A) -- (CableRef);
+\node[gray, above] at (CableRef) {\scriptsize Cable forces};
+\node[gray, below] at (CableRef) {\scriptsize transmitted through Link 2};
+
+% Show angle q1
+\draw[linkcolor] ([shift={(0.5,0)}] O) arc (0:26.57:0.5);
+\node[linkcolor] at ([shift={(0.7,0.2)}] O) {\Large $q_1$};
+
+% === FORCE BALANCE EQUATIONS ===
+\node[align=left, below] at (0,-2.5) {
+\Large \textbf{Force Balance on Link 1:} \\[0.3cm]
+\Large \textbf{Horizontal:} $\sum F_x = 0$ \\
+\Large $X_{O1} - X_A = 0$ \\
+\Large $\boxed{X_{O1} = X_A}$ \\[0.3cm]
+\Large \textbf{Vertical:} $\sum F_y = 0$ \\
+\Large $Y_{O1} - Y_A - m_1 g = 0$ \\
+\Large $\boxed{Y_{O1} = Y_A + m_1 g}$
+};
+
+% === MOMENT BALANCE ===
+\node[align=left, below] at (0,-4.5) {
+\Large \textbf{Moment Balance about Joint O:} \\
+\Large $\sum M_O = 0$ \\
+\Large $X_A \cdot l_1\sin(q_1) + Y_A \cdot l_1\cos(q_1) - \frac{1}{2}m_1 g l_1\cos(q_1) = 0$
+};
+
+% === SIGN CONVENTION NOTE ===
+\node[align=center, draw, fill=yellow!20, above] at (4.5,2.5) {
+\textbf{Sign Convention:} \\
+$X_{O1}, Y_{O1} > 0$: Ground reactions \\
+$X_A, Y_A > 0$: Forces Link 1 \\
+applies \textbf{TO} Link 2 \\
+$m_1 g$: Weight acts downward \\
+\textbf{Newton's 3rd Law:} Link 2 applies \\
+$-X_A, -Y_A$ to Link 1
+};
+
+\end{tikzpicture}
