@@ -1,5 +1,7 @@
 # Singularity Analysis of a Hybrid Serial-Cable Driven Planar Robot
 
+**Author**: Mourad
+
 ## Project Overview
 This project implements the singularity analysis of a hybrid serial-cable driven planar robot as described in the research paper `ajeassp.2022.197.208.pdf`. The implementation focuses on identifying and analyzing singular configurations where the robot loses degrees of freedom or becomes uncontrollable.
 
