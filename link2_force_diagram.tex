@@ -1,0 +1,98 @@
+\documentclass[tikz,border=3mm]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,positioning}
+
+\begin{document}
+
+\begin{tikzpicture}[>=Stealth, scale=1.5]
+
+% Define colors
+\definecolor{linkcolor}{RGB}{70,130,180}
+\definecolor{forcecolor}{RGB}{220,20,60}
+\definecolor{cablecolor}{RGB}{139,69,19}
+\definecolor{weightcolor}{RGB}{34,139,34}
+
+% Link 2 geometry
+\coordinate (A) at (0,0);  % Joint A (connection to Link 1)
+\coordinate (M) at (3,1);  % End-effector point M
+\coordinate (G2) at (1.5,0.5);  % Center of gravity of Link 2
+
+% Draw Link 2
+\draw[very thick, linkcolor] (A) -- (M);
+\filldraw[linkcolor!30] (A) circle (0.1);
+\filldraw[linkcolor!30] (M) circle (0.1);
+
+% Labels for points
+\node[below left] at (A) {\Large $A$};
+\node[above right] at (M) {\Large $M$};
+\node[below] at (G2) {\Large $G_2$};
+
+% Link 2 label
+\node[above, linkcolor] at (1.5,0.8) {\Large \textbf{Link 2}};
+
+% Coordinate system
+\draw[->] (A) + (-0.5,-0.5) -- +(-0.5,0.5) node[left] {$y$};
+\draw[->] (A) + (-0.5,-0.5) -- +(0.5,-0.5) node[below] {$x$};
+
+% === FORCES ACTING ON LINK 2 ===
+
+% 1. Weight of Link 2 (at center of gravity)
+\draw[->, very thick, weightcolor] (G2) -- +(0,-1.2) node[below] {\Large $m_2 g$};
+\node[weightcolor, right] at (G2) + (0.2,-0.6) {\Large Weight};
+
+% 2. Reaction forces from Link 1 at joint A
+\draw[->, very thick, forcecolor] (A) -- +(1,0) node[above] {\Large $X_A$};
+\draw[->, very thick, forcecolor] (A) -- +(0,1) node[left] {\Large $Y_A$};
+\node[forcecolor, below right] at (A) + (0.5,0.5) {\Large Joint reaction};
+\node[forcecolor, below right] at (A) + (0.5,0.3) {\Large from Link 1};
+
+% 3. Cable forces at end-effector M
+% Cable 1 anchor
+\coordinate (Anchor1) at (M) + (-2,2);
+\draw[dashed, cablecolor] (Anchor1) -- (M);
+\node[cablecolor, above left] at (Anchor1) {\Large Anchor 1 $(-L,0)$};
+
+% Cable 1 force components
+\draw[->, very thick, cablecolor] (M) -- +(-1.2,1.2) node[above left] {\Large $T_1$};
+\draw[->, thick, cablecolor!70] (M) -- +(-0.8,0) node[below] {\scriptsize $T_1\cos\alpha_1$};
+\draw[->, thick, cablecolor!70] (M) -- +(0,0.8) node[right] {\scriptsize $T_1\sin\alpha_1$};
+
+% Cable 2 anchor  
+\coordinate (Anchor2) at (M) + (2,1.5);
+\draw[dashed, cablecolor] (Anchor2) -- (M);
+\node[cablecolor, above right] at (Anchor2) {\Large Anchor 2 $(+L,0)$};
+
+% Cable 2 force components
+\draw[->, very thick, cablecolor] (M) -- +(1.0,0.75) node[above right] {\Large $T_2$};
+\draw[->, thick, cablecolor!70] (M) -- +(0.6,0) node[below] {\scriptsize $T_2\cos\alpha_2$};
+\draw[->, thick, cablecolor!70] (M) -- +(0,0.6) node[left] {\scriptsize $T_2\sin\alpha_2$};
+
+% Cable angles
+\draw[cablecolor] (M) + (0.3,0) arc (0:37:0.3);
+\node[cablecolor] at (M) + (0.5,0.2) {\scriptsize $\alpha_2$};
+\draw[cablecolor] (M) + (-0.3,0) arc (180:135:0.3);
+\node[cablecolor] at (M) + (-0.5,0.25) {\scriptsize $\alpha_1$};
+
+% === FORCE BALANCE EQUATIONS ===
+\node[align=left, below] at (0,-2) {
+\Large \textbf{Force Balance on Link 2:} \\[0.3cm]
+\Large \textbf{Horizontal:} $\sum F_x = 0$ \\
+\Large $X_A + T_1\cos\alpha_1 + T_2\cos\alpha_2 = 0$ \\
+\Large $\boxed{X_A = -T_1\cos\alpha_1 - T_2\cos\alpha_2}$ \\[0.3cm]
+\Large \textbf{Vertical:} $\sum F_y = 0$ \\
+\Large $Y_A + T_1\sin\alpha_1 + T_2\sin\alpha_2 - m_2 g = 0$ \\
+\Large $\boxed{Y_A = m_2 g - T_1\sin\alpha_1 - T_2\sin\alpha_2}$
+};
+
+% === SIGN CONVENTION NOTE ===
+\node[align=center, draw, fill=yellow!20, above] at (4,3) {
+\textbf{Sign Convention:} \\
+$X_A, Y_A > 0$: Forces Link 1 \\
+applies \textbf{TO} Link 2 \\
+Cables pull \textbf{ON} Link 2 \\
+Weight acts \textbf{ON} Link 2
+};
+
+\end{tikzpicture}
+
+\end{document}
