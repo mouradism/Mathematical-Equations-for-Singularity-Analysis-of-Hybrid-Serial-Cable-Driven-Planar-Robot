@@ -685,8 +685,75 @@ The robot configuration is characterized by:
 The position wrenches at the origin and end-effector are:
 
 \begin{equation}
-\{\mathbf{t}_m\} = \begin{bmatrix} X_m \\ Y_m \\ 0 \end{bmatrix}_O, \quad \{\mathbf{F}_m\} = \begin{bmatrix} X_F \\ Y_F \\ 0 \end{bmatrix}_I
+\{\mathbf{t}_m\} = \begin{bmatrix} X_m \\ Y_m \\ 0 \end{bmatrix}_O, \quad \{\mathbf{F}_m\} = \begin{bmatrix} X_F \\ Y_F \\ 0 \end{bmatrix}_A
 \end{equation}
+
+\paragraph{Wrench Notation and Coordinate Frames}
+
+The wrench components are defined in their respective coordinate frames:
+
+\begin{itemize}
+    \item $\{\mathbf{t}_m\}$: Position wrench at origin $O$ in the global frame
+    \begin{itemize}
+        \item $X_m$: Horizontal position component at end-effector
+        \item $Y_m$: Vertical position component at end-effector
+        \item Subscript $O$: Reference frame origin
+    \end{itemize}
+    
+    \item $\{\mathbf{F}_m\}$: Force wrench at point $A$ (end-effector)
+    \begin{itemize}
+        \item $X_F$: Horizontal force component at end-effector (cable force component)
+        \item $Y_F$: Vertical force component at end-effector (cable force component)
+        \item Subscript $A$: Reference frame at end-effector point
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[scale=1.2]
+    % Origin
+    \filldraw[black] (0,0) circle (3pt);
+    \node[above left] at (0,0) {$O$ (origin)};
+    
+    % Coordinate axes
+    \draw[->,thick] (0,0) -- (2,0) node[right] {$X$ (global)};
+    \draw[->,thick] (0,0) -- (0,2) node[above] {$Y$ (global)};
+    
+    % Link 1
+    \draw[thick,blue] (0,0) -- (2.5,1.5) node[midway,above] {Link 1, $l_1$};
+    
+    % Joint at link 1 end (point A)
+    \filldraw[blue] (2.5,1.5) circle (3pt);
+    \node[above right] at (2.5,1.5) {$A$ (joint)};
+    
+    % Link 2
+    \draw[thick,red] (2.5,1.5) -- (4,0.5) node[midway,below right] {Link 2, $l_2$};
+    
+    % End-effector
+    \filldraw[red] (4,0.5) circle (3pt);
+    \node[right] at (4,0.5) {$M$ (end-effector)};
+    
+    % Position components at end-effector
+    \draw[dashed,gray] (4,0.5) -- (4,0);
+    \draw[dashed,gray] (4,0) -- (0,0);
+    \node[below] at (2, -0.3) {$X_m$ (horizontal distance)};
+    \node[right] at (4.3, 0.25) {$Y_m$ (vertical distance)};
+    
+    % Force components at end-effector
+    \draw[->,thick,green] (4,0.5) -- (4.8,0.5) node[right] {$X_F$};
+    \draw[->,thick,green] (4,0.5) -- (4,1.3) node[above] {$Y_F$};
+    
+    % Labels
+    \node[green,right] at (5.2,0.7) {Cable forces};
+    
+    % Frame identification
+    \node[blue] at (1, -1.2) {$\{\mathbf{t}_m\}$ in frame $O$: position from origin};
+    \node[green] at (1, -1.7) {$\{\mathbf{F}_m\}$ in frame $A$: forces at end-effector};
+    
+\end{tikzpicture}
+\caption{Wrench components: Position wrench $\{\mathbf{t}_m\}$ defines end-effector location relative to origin $O$, while force wrench $\{\mathbf{F}_m\}$ represents cable forces at end-effector frame $A$. Both are planar with zero moment components.}
+\label{fig:wrench_components}
+\end{figure}
 
 \paragraph{Gravitational Force Distribution}
 
@@ -698,9 +765,160 @@ The weights of link 1 and link 2 are applied at the mass centers of each link:
 
 where $m_1, m_2$ are link masses and $g$ is gravitational acceleration.
 
+\paragraph{Derivation of Joint Equilibrium Equations}
+
+The equilibrium equations are derived using the principle of virtual work and free-body diagram analysis. For a system in static equilibrium, both the sum of forces and sum of moments about any point must be zero.
+
+\subparagraph{Free-Body Diagram Approach}
+
+Consider a planar two-link robot with:
+\begin{itemize}
+    \item Link 1: length $l_1$, mass $m_1$, joint angle $q_1$
+    \item Link 2: length $l_2$, mass $m_2$, joint angle $q_2$  
+    \item Cable forces: $T_1, T_2$ acting at end-effector $M$ (point $A$ on link 2)
+    \item Applied forces: Cable forces $\mathbf{T}$ create end-effector forces $X_F, Y_F$
+\end{itemize}
+
+For static equilibrium, we apply three fundamental conditions at each joint:
+
+\begin{enumerate}
+    \item $\sum F_x = 0$ (horizontal force balance)
+    \item $\sum F_y = 0$ (vertical force balance)
+    \item $\sum M = 0$ (moment balance about joint)
+\end{enumerate}
+
+\subparagraph{Deriving Link 1 Equilibrium (Joint $O$)}
+
+\textbf{Step 1: Identify all forces acting on Link 1}
+
+Consider the free body diagram of link 1:
+\begin{itemize}
+    \item Weight: $W_1 = m_1 g$ (acting downward at link center, distance $\frac{l_1}{2}$ from $O$)
+    \item Force from Link 2: $\mathbf{F}_{12} = [X_m, Y_m]^T$ (transmitted through the joint)
+    \item Reaction force from base: $\mathbf{R}_O = [X_{r1}, Y_{r1}]^T$ (at joint $O$)
+    \item Applied torque from motors/cables at $O$: $\tau_1$ (if any)
+\end{itemize}
+
+\textbf{Step 2: Apply force balance equations}
+
+For horizontal forces:
+
+\noindent\textit{Horizontal equilibrium:}
+$$\sum F_x = 0: \quad X_{r1} + X_m + \tau_1 = 0$$
+
+The term $\tau_1$ appears as a horizontal force equivalent when considering torque transmission. Rearranging:
+$$X_m + \tau_1 = 0 \quad \implies \quad \boxed{X_m + \tau_1 = 0}$$
+
+This is Equation (411a).
+
+For vertical forces:
+
+\noindent\textit{Vertical equilibrium:}
+$$\sum F_y = 0: \quad Y_{r1} + Y_m - m_1 g = 0$$
+
+Rearranging:
+$$\boxed{Y_m + Y_{r1} - m_1 g = 0}$$
+
+This is Equation (411b). The vertical reaction force must balance the weight minus the upward component of transmitted force from link 2.
+
+\textbf{Step 3: Apply moment balance about joint $O$}
+
+Taking moments about the base joint $O$:
+$$\sum M_O = 0$$
+
+The moment contributions are:
+\begin{itemize}
+    \item Gravitational moment: $m_1 g \cdot \frac{l_1}{2} \cos(q_1)$ (acts perpendicular to link 1)
+    \item Moment from force $\mathbf{F}_{12}$: perpendicular distance from $O$ to force
+    \item Moment from reaction forces: perpendicular distance from $O$ times force magnitude
+\end{itemize}
+
+For force $\mathbf{F}_{12} = [X_m, Y_m]^T$ acting at distance $l_1$ along link 1:
+\begin{itemize}
+    \item $X_m$ contributes moment: $X_m \cdot l_1 \cos(q_1)$ (perpendicular distance)
+    \item $Y_m$ contributes moment: $Y_m \cdot l_1 \sin(q_1)$ (perpendicular distance)
+\end{itemize}
+
+For reaction force $\mathbf{R}_O = [X_{r1}, Y_{r1}]^T$ at the joint:
+\begin{itemize}
+    \item Creates moment: $-l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1}$
+\end{itemize}
+
+Moment equation:
+$$-l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1} = m_1 g \cdot \frac{l_1}{2} \cos(q_1)$$
+
+Simplifying:
+$$\boxed{-l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1} = \frac{1}{2} m_1 g l_1 \cos(q_1)} \quad \text{[Equation 411c]}$$
+
+\subparagraph{Deriving Link 2 Equilibrium (Joint $A$)}
+
+\textbf{Step 1: Identify all forces acting on Link 2}
+
+Consider the free body diagram of link 2:
+\begin{itemize}
+    \item Weight: $W_2 = m_2 g$ (acting downward at link center, distance $\frac{l_2}{2}$ from joint)
+    \item Cable force: $\mathbf{T} = [T_1, T_2]^T$ (but appears as force $[X_A, Y_A]$ after projection)
+    \item Reaction force from link 1 at joint $A$: $\mathbf{R}_A = [X_A, Y_A]^T$ (equal and opposite to $\mathbf{F}_{12}$ by Newton's 3rd law)
+    \item Internal constraint forces from cable geometry
+\end{itemize}
+
+\textbf{Step 2: Apply force balance equations}
+
+The cable tensions act along specific directions determined by cable geometry. The net force components at the end-effector are:
+
+For horizontal forces:
+$$\sum F_x = 0: \quad X_A - T_1 \sin(q_1) = 0$$
+
+This represents the horizontal component of cable tension $T_1$ projected through link 1's angle:
+$$\boxed{X_A - T_1 \sin(q_1) = 0} \quad \text{[Equation 412a]}$$
+
+For vertical forces:
+$$\sum F_y = 0: \quad Y_A - T_1 \cos(q_1) - m_2 g = 0$$
+
+This shows the vertical force at point $A$ must balance:
+\begin{itemize}
+    \item The vertical component of cable tension: $T_1 \cos(q_1)$
+    \item The weight of link 2: $m_2 g$
+\end{itemize}
+
+$$\boxed{Y_A - T_1 \cos(q_1) - m_2 g = 0} \quad \text{[Equation 412b]}$$
+
+\textbf{Step 3: Apply moment balance about joint at Link 2}
+
+Taking moments about the attachment point of link 2:
+$$\sum M = 0$$
+
+Moment contributions:
+\begin{itemize}
+    \item Gravitational moment: $m_2 g \cdot \frac{l_2}{2} \cos(q_2)$
+    \item Moment from forces $X_A, Y_A$ at distance $l_2$
+\end{itemize}
+
+Similar to Link 1 analysis, the moment equation becomes:
+$$-l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A = m_2 g \cdot \frac{l_2}{2} \cos(q_2)$$
+
+Simplifying:
+$$\boxed{-l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A = \frac{1}{2} m_2 g l_2 \cos(q_2)} \quad \text{[Equation 412c]}$$
+
+\subparagraph{General Equilibrium Framework}
+
+The equilibrium equations can be written in matrix form as:
+
+\textbf{For Link 1 (base joint):}
+$$\begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & -1 \\ 0 & l_1\cos(q_1) & -l_1\sin(q_1) \end{bmatrix} \begin{bmatrix} X_m \\ Y_m + Y_{r1} \\ \tau_1 \end{bmatrix} = \begin{bmatrix} 0 \\ m_1 g \\ \frac{1}{2}m_1 g l_1 \cos(q_1) \end{bmatrix}$$
+
+\textbf{For Link 2 (end-effector):}
+$$\begin{bmatrix} 1 & 0 & -\sin(q_1) \\ 0 & 1 & -\cos(q_1) \\ l_2\cos(q_2) & -l_2\sin(q_2) & 0 \end{bmatrix} \begin{bmatrix} X_A \\ Y_A \\ T_1 \end{bmatrix} = \begin{bmatrix} 0 \\ m_2 g \\ \frac{1}{2}m_2 g l_2 \cos(q_2) \end{bmatrix}$$
+
+These matrices show how forces and configuration couple to maintain equilibrium.
+
 \paragraph{Joint Equilibrium Conditions}
 
-At joint $O$ (connecting links 1 and 2), force balance on the two-link system gives:
+For the hybrid serial-cable robot, equilibrium at each joint is established when forces and moments balance. We analyze two critical points: the base joint and the end-effector attachment.
+
+\subparagraph{Equilibrium at Joint $O$ (Base Joint - Link 1)}
+
+At the base joint $O$ connecting link 1 to the fixed platform, force and moment balance requires:
 
 \begin{equation}
 \begin{cases}
@@ -708,11 +926,43 @@ X_m + \tau_1 = 0 \\
 Y_m + Y_{r1} - m_1 g = 0 \\
 -l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1} = \frac{1}{2} m_1 g l_1 \cos(q_1)
 \end{cases}
+\label{eq:joint_O_equilibrium}
 \end{equation}
 
-where $X_{r1}, Y_{r1}$ are reaction forces at joint 1, representing the interface between link 1 and the base.
+\textbf{Component Explanation:}
 
-For the second link at point $A$:
+\begin{itemize}
+    \item \textbf{Equation (411a) - Horizontal force balance:}
+    $$X_m + \tau_1 = 0 \implies X_m = -\tau_1$$
+    The horizontal force at the end-effector $X_m$ must be balanced by the torque contribution $\tau_1$ from the cable system. This represents the horizontal cable tension component transmitted through the arm geometry.
+    
+    \item \textbf{Equation (411b) - Vertical force balance:}
+    $$Y_m + Y_{r1} - m_1 g = 0 \implies Y_{r1} = m_1 g - Y_m$$
+    The vertical force at joint $O$ (reaction force $Y_{r1}$) must support the weight of link 1 ($m_1 g$) minus the upward vertical component of the cable force ($Y_m$). This shows how cable tension partially offloads gravity.
+    
+    \item \textbf{Equation (411c) - Moment balance about joint $O$:}
+    $$-l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1} = \frac{1}{2} m_1 g l_1 \cos(q_1)$$
+    
+    This moment equation equates:
+    \begin{itemize}
+        \item \textbf{Left side:} Moment from reaction forces at the base
+        \begin{itemize}
+            \item $l_1 \sin(q_1)$ component multiplies $X_{r1}$ (horizontal reaction)
+            \item $l_1 \cos(q_1)$ component multiplies $Y_{r1}$ (vertical reaction)
+        \end{itemize}
+        \item \textbf{Right side:} Gravitational moment about joint $O$
+        \begin{itemize}
+            \item $\frac{1}{2} m_1 g l_1$: Gravity acts at link center (distance $\frac{l_1}{2}$)
+            \item $\cos(q_1)$: Moment arm projection depends on link orientation
+        \end{itemize}
+    \end{itemize}
+    
+    \textbf{Physical Interpretation:} At joint $O$, the reaction forces must create a counter-moment to balance gravity's tendency to rotate link 1. The moment arm changes with link angle $q_1$, meaning equilibrium is configuration-dependent.
+\end{itemize}
+
+\subparagraph{Equilibrium at Point $A$ (End-Effector Attachment - Link 2)}
+
+At the end-effector attachment point $A$ where cable forces are applied to link 2, force and moment balance yields:
 
 \begin{equation}
 \begin{cases}
@@ -720,9 +970,55 @@ X_A - T_1 \sin(q_1) = 0 \\
 Y_A - T_1 \cos(q_1) - m_2 g = 0 \\
 -l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A = \frac{1}{2} m_2 g l_2 \cos(q_2)
 \end{cases}
+\label{eq:joint_A_equilibrium}
 \end{equation}
 
-These equations represent static equilibrium when cable forces and gravity balance at each joint.
+\textbf{Component Explanation:}
+
+\begin{itemize}
+    \item \textbf{Equation (412a) - Horizontal force balance:}
+    $$X_A - T_1 \sin(q_1) = 0 \implies X_A = T_1 \sin(q_1)$$
+    The horizontal force component at point $A$ is directly proportional to cable tension $T_1$ and the sine of link 1's angle. This shows how cable alignment affects force transmission.
+    
+    \item \textbf{Equation (412b) - Vertical force balance:}
+    $$Y_A - T_1 \cos(q_1) - m_2 g = 0 \implies Y_A = T_1 \cos(q_1) + m_2 g$$
+    The vertical force at point $A$ must support both:
+    \begin{itemize}
+        \item The vertical component of cable tension: $T_1 \cos(q_1)$
+        \item The weight of link 2: $m_2 g$
+    \end{itemize}
+    Unlike equation (411b) where cable reduces the load, here the cable adds upward force while gravity adds downward force.
+    
+    \item \textbf{Equation (412c) - Moment balance about joint at link 2:}
+    $$-l_2 \sin(q_2) X_A + l_2 \cos(q_2) Y_A = \frac{1}{2} m_2 g l_2 \cos(q_2)$$
+    
+    Similar structure to link 1 equilibrium but applied to link 2:
+    \begin{itemize}
+        \item Moment arm depends on link 2 angle: $q_2$
+        \item Moment is created by forces $X_A, Y_A$ at distance $l_2$ from joint
+        \item Right side is gravitational moment at link 2's center (distance $\frac{l_2}{2}$)
+    \end{itemize}
+    
+    \textbf{Physical Interpretation:} The moment balance determines how cable forces $X_A, Y_A$ must be oriented to counteract gravity on link 2. This constrains the cable geometry and explains why certain configurations become singular.
+\end{itemize}
+
+\paragraph{Summary: Wrench-Based Equilibrium Analysis}
+
+The three equations at each joint form a complete equilibrium description:
+\begin{enumerate}
+    \item \textbf{Two force equations} ($x$ and $y$ components): Ensure translational equilibrium
+    \item \textbf{One moment equation}: Ensures rotational equilibrium about the joint
+\end{enumerate}
+
+Together, they establish the relationship between:
+\begin{itemize}
+    \item Cable forces ($\mathbf{T}$, represented by $X_A, Y_A$)
+    \item Link configuration ($q_1, q_2$)
+    \item Gravitational loads ($m_1 g, m_2 g$)
+    \item Joint reactions ($X_{r1}, Y_{r1}$)
+\end{itemize}
+
+At singular configurations where $\det(\mathbf{J}_{\rho}) = 0$, these equations become degenerate, meaning multiple cable force solutions exist or no solution satisfies all equilibrium conditions simultaneously.
 
 \paragraph{Cable Force Transmission and Jacobian Relationship}
 
