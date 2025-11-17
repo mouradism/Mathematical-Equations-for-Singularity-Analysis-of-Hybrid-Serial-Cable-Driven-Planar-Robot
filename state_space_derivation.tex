@@ -463,13 +463,23 @@ The specific gravity terms $(\frac{1}{2}m_i g \cos q_i)$ come directly from $\ma
 
 \subsubsection{7.17.13 Numerical Implementation}
 
-To implement these equations programmatically:
+To implement these equations programmatically, use Python with NumPy and SciPy libraries. The dynamics simulator integrates the state-space equations:
 
-\textbf{Python pseudocode:}
+\textbf{Key implementation steps:}
 
-\begin{lstlisting}[language=Python]
-import numpy as np
+\begin{enumerate}
+    \item \textbf{Initialize robot parameters}: Link lengths, masses, inertias
+    \item \textbf{Compute forward kinematics}: Position from joint angles
+    \item \textbf{Compute Jacobians}: Velocity and cable geometry relationships
+    \item \textbf{Assemble mass matrix}: From inertia parameters
+    \item \textbf{Compute gravity terms}: Configuration-dependent gravitational torques
+    \item \textbf{Solve for accelerations}: Invert dynamics equation
+    \item \textbf{Integrate state}: Use ODE solver for time evolution
+\end{enumerate}
 
+\textbf{Python class structure:}
+
+\begin{verbatim}
 class HybridRobotDynamics:
     def __init__(self, l1, l2, m1, m2, I1, I2, g=9.81):
         self.l1, self.l2 = l1, l2
@@ -478,55 +488,49 @@ class HybridRobotDynamics:
         self.g = g
     
     def forward_kinematics(self, q):
-        x = self.l1*np.cos(q[0]) + self.l2*np.cos(q[0]+q[1])
-        y = self.l1*np.sin(q[0]) + self.l2*np.sin(q[0]+q[1])
-        return np.array([x, y])
-    
-    def velocity_kinematics(self, q, dq):
-        # Jacobian matrix
-        J = np.array([
-            [-self.l1*np.sin(q[0]) - self.l2*np.sin(q[0]+q[1]), 
-             -self.l2*np.sin(q[0]+q[1])],
-            [self.l1*np.cos(q[0]) + self.l2*np.cos(q[0]+q[1]),
-             self.l2*np.cos(q[0]+q[1])]
-        ])
-        return J @ dq
+        x = self.l1*cos(q[0]) + self.l2*cos(q[0]+q[1])
+        y = self.l1*sin(q[0]) + self.l2*sin(q[0]+q[1])
+        return [x, y]
     
     def mass_matrix(self):
-        M = np.array([
-            [self.I1 + self.I2, self.I2],
-            [self.I2, self.I2]
-        ])
-        return M
+        return [[self.I1+self.I2, self.I2],
+                [self.I2, self.I2]]
     
     def gravity_torques(self, q):
-        g1 = (self.m1*self.l1/2 + self.m2*self.l1)*self.g*np.cos(q[0]) \
-           + self.m2*self.l2/2*self.g*np.cos(q[0]+q[1])
-        g2 = self.m2*self.l2/2*self.g*np.cos(q[0]+q[1])
-        return np.array([g1, g2])
+        g1 = (self.m1*self.l1/2 + self.m2*self.l1)*self.g*cos(q[0])
+        g1 += self.m2*self.l2/2*self.g*cos(q[0]+q[1])
+        g2 = self.m2*self.l2/2*self.g*cos(q[0]+q[1])
+        return [g1, g2]
     
     def state_derivative(self, x, u, T):
-        # x = [x_m, y_m, dx_m, dy_m, T1, T2]
-        # u = [tau1, tau2]
-        q = self.compute_q_from_xm(x[:2])
-        dq = self.compute_dq_from_dxm(q, x[2:4])
+        # Compute from state
+        q = self.q_from_position(x[0:2])
+        dq = self.dq_from_velocity(q, x[2:4])
         
+        # Get system matrices
         M = self.mass_matrix()
         G = self.gravity_torques(q)
-        J_rho_T = self.cable_geometry_jacobian_transpose(q, T)
         
-        # Solve for accelerations
-        ddq = np.linalg.solve(M, u + J_rho_T - G)
+        # Solve: M*ddq = u + J_rho_T*T - G
+        ddq = solve(M, u + J_rho_T(q, T) - G)
         
-        # Compute accelerations in Cartesian
-        dx_m = x[2:4]
-        ddx_m = self.compute_cartesian_acceleration(q, dq, ddq)
-        
-        # Tension dynamics
-        dT = self.tension_dynamics(T, u_tension)
-        
-        return np.concatenate([dx_m, ddx_m, dT])
-\end{lstlisting}
+        # Return derivatives
+        return concatenate([x[2:4], ddq, dT])
+\end{verbatim}
+
+\textbf{Integration with scipy.integrate.odeint:}
+
+\begin{verbatim}
+def dynamics_function(state, t, robot, controls):
+    return robot.state_derivative(state, controls(t))
+
+from scipy.integrate import odeint
+
+t = linspace(0, 10, 1000)
+initial_state = [0, 0, 0, 0, 5, 5]
+trajectory = odeint(dynamics_function, initial_state, t, 
+                   args=(robot, control_input))
+\end{verbatim}
 
 \subsubsection{7.17.14 Connection to Singularity Analysis}
 
