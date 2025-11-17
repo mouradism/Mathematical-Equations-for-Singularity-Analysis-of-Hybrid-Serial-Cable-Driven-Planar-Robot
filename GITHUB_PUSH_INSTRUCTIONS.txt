@@ -1,0 +1,84 @@
+================================================================================
+GITHUB PUSH INSTRUCTIONS - Manual Steps Required
+================================================================================
+
+⚠️  The repository doesn't exist on GitHub yet. Follow these steps:
+
+STEP 1: CREATE REPOSITORY ON GITHUB
+================================================================================
+1. Open your browser and go to: https://github.com/new
+2. Log in with your GitHub account (mourad)
+3. Fill in these details:
+
+   Repository name: 
+   Mathematical-Equations-for-Singularity-Analysis-of-Hybrid-Serial-Cable-Driven-Planar-Robot
+
+   Description (optional):
+   Mathematical framework and singularity analysis of a hybrid serial-cable driven planar robot
+
+   Visibility: 
+   ☐ Public (recommended for sharing)
+   ☐ Private (if you want to keep it private)
+
+4. IMPORTANT: DO NOT check these boxes:
+   ☐ Initialize this repository with a README
+   ☐ Add .gitignore
+   ☐ Add a license
+
+5. Click the green "Create repository" button
+
+6. You'll see a page with setup instructions. Copy the HTTPS URL that looks like:
+   https://github.com/mourad/Mathematical-Equations-for-Singularity-Analysis-of-Hybrid-Serial-Cable-Driven-Planar-Robot.git
+
+STEP 2: PUSH FROM TERMINAL
+================================================================================
+Once the repository is created, run these commands in PowerShell:
+
+cd "C:\Users\mourad\Desktop\Singularity Analysis of a Hybrid Serial-Cable Driven Planar Robot"
+
+git push -u origin main
+
+When prompted for credentials:
+- Username: mourad (your GitHub username)
+- Password: Use your Personal Access Token (NOT your GitHub password)
+  
+  To create a Personal Access Token:
+  1. Go to GitHub → Settings → Developer settings → Personal access tokens
+  2. Click "Generate new token (classic)"
+  3. Give it a name like "Git Push Token"
+  4. Set expiration to 90 days
+  5. Select scope: repo (full control of private repositories)
+  6. Click "Generate token"
+  7. Copy the token (you'll only see it once)
+  8. Use this token as your password when Git prompts
+
+STEP 3: VERIFY PUSH SUCCESS
+================================================================================
+After the push completes, run:
+
+git log --oneline --all
+git remote -v
+
+Then visit: https://github.com/mourad/Mathematical-Equations-for-Singularity-Analysis-of-Hybrid-Serial-Cable-Driven-Planar-Robot
+
+You should see your files on GitHub!
+
+================================================================================
+QUICK SUMMARY
+================================================================================
+1. Go to https://github.com/new
+2. Create repository with name: Mathematical-Equations-for-Singularity-Analysis-of-Hybrid-Serial-Cable-Driven-Planar-Robot
+3. Don't initialize with anything
+4. Run: git push -u origin main
+5. Enter GitHub username and Personal Access Token when prompted
+6. Done! ✅
+
+================================================================================
+NEED HELP?
+================================================================================
+- Can't create repository? Check if you're logged into GitHub
+- Authentication failed? Generate a Personal Access Token (not your password)
+- Repository name too long? You can use a shorter name like: Singularity-Analysis-Hybrid-Robot
+- Still having issues? Check GITHUB_SETUP.md for troubleshooting
+
+================================================================================
