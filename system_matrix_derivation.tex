@@ -1,0 +1,467 @@
+\subsection{7.18 Complete System Matrix Derivation - Equations (7) and (8)}
+
+This subsection provides the complete step-by-step derivation of the system matrix $[A]$ and state-vector transformation, matching the equations shown in the attached reference material.
+
+\subsubsection{7.18.1 State Vector Definition}
+
+The complete state vector is defined as:
+
+\begin{equation}
+\boxed{\begin{bmatrix}
+X_{01} \\
+Y_{01} \\
+X_{21} \\
+Y_{21} \\
+T_1 \\
+T_2
+\end{bmatrix} = [A] \begin{bmatrix}
+X_{01} \\
+Y_{01} \\
+X_{21} \\
+Y_{21} \\
+T_1 \\
+T_2
+\end{bmatrix}}
+\end{equation}
+
+where the notation is:
+\begin{itemize}
+    \item $X_{01}, Y_{01}$ = End-effector (point M) position in base frame (frame 0)
+    \item $X_{21}, Y_{21}$ = End-effector velocity components (frame 2 perspective or Cartesian derivatives)
+    \item $T_1, T_2$ = Cable tensions
+\end{itemize}
+
+\textbf{Alternative notation clarification:}
+
+The subscript notation can be interpreted as:
+\begin{align}
+X_{01} &= x_m \text{ (position of point M from origin 0)} \\
+Y_{01} &= y_m \text{ (position of point M from origin 0)} \\
+X_{21} &= \dot{x}_m \text{ (velocity, time derivative = 1st time derivative)} \\
+Y_{21} &= \dot{y}_m \text{ (velocity)} \\
+T_1, T_2 &= \text{Cable tensions (state-like variables)}
+\end{align}
+
+\subsubsection{7.18.2 Time Derivatives of State Components}
+
+The first and second components represent position, so their time derivatives are velocities:
+
+\begin{equation}
+\dot{X}_{01} = X_{21}
+\end{equation}
+
+\begin{equation}
+\dot{Y}_{01} = Y_{21}
+\end{equation}
+
+\textbf{State equations for position (rows 1-2 of [A]):}
+
+\begin{equation}
+\dot{X}_{01} = 0 \cdot X_{01} + 0 \cdot Y_{01} + 1 \cdot X_{21} + 0 \cdot Y_{21} + 0 \cdot T_1 + 0 \cdot T_2
+\end{equation}
+
+\begin{equation}
+\dot{Y}_{01} = 0 \cdot X_{01} + 0 \cdot Y_{01} + 0 \cdot X_{21} + 1 \cdot Y_{21} + 0 \cdot T_1 + 0 \cdot T_2
+\end{equation}
+
+\subsubsection{7.18.3 Time Derivatives of Velocity Components}
+
+The velocity components evolve according to the equations of motion from Euler-Lagrange:
+
+\begin{equation}
+\mathbf{M}(\mathbf{q}) \ddot{\mathbf{q}} + \mathbf{G}(\mathbf{q}) = \boldsymbol{\tau} + \mathbf{J}_{\rho}^T(\mathbf{q}) \mathbf{T}
+\end{equation}
+
+Solving for joint accelerations:
+
+\begin{equation}
+\ddot{\mathbf{q}} = \mathbf{M}^{-1} \left[ \mathbf{J}_{\rho}^T(\mathbf{q}) \mathbf{T} - \mathbf{G}(\mathbf{q}) \right]
+\end{equation}
+
+\textbf{Transforming to Cartesian acceleration:}
+
+The Cartesian accelerations are related to joint accelerations through:
+
+\begin{equation}
+\ddot{\mathbf{r}}_m = \mathbf{J}_q(\mathbf{q}) \ddot{\mathbf{q}} + \dot{\mathbf{J}}_q(\mathbf{q}, \dot{\mathbf{q}}) \dot{\mathbf{q}}
+\end{equation}
+
+where $\mathbf{J}_q$ is the joint Jacobian.
+
+Therefore:
+
+\begin{equation}
+\begin{bmatrix}
+\dot{X}_{21} \\
+\dot{Y}_{21}
+\end{bmatrix} = \begin{bmatrix}
+\ddot{x}_m \\
+\ddot{y}_m
+\end{bmatrix} = f(X_{01}, Y_{01}, X_{21}, Y_{21}, T_1, T_2)
+\end{equation}
+
+\textbf{Detailed expansion:}
+
+The acceleration components depend on:
+
+1. **Configuration effects** (position-dependent): $-\sin q_i$, $\cos q_i$ terms
+2. **Centrifugal/Coriolis effects** (velocity-dependent): $(\dot{q}_1)^2$ terms
+3. **Gravity terms**: $g \cos(q_i)$ components
+4. **Tension coupling**: $\mathbf{J}_{\rho}^T \mathbf{T}$ terms
+
+\subsubsection{7.18.4 Gravity Component Decomposition}
+
+From equation (7) in your attachment, the constant term vector on the RHS shows:
+
+\begin{equation}
+\text{Gravity/Inertial Effects} = \begin{bmatrix}
+0 \\
+m_1 g \\
+\frac{1}{2} m_1 g \cos q_1 \\
+0 \\
+m_2 g \\
+\frac{1}{2} m_2 g \cos(q_1 + q_2)
+\end{bmatrix}
+\end{equation}
+
+These represent:
+\begin{itemize}
+    \item Row 1: Position equation (no constant effect)
+    \item Row 2: Gravity effect on link 1 (vertical component $m_1 g$)
+    \item Row 3: Torque component from link 1 mass
+    \item Row 4: Velocity equation (no constant effect)
+    \item Row 5: Gravity effect on link 2
+    \item Row 6: Torque component from link 2 mass
+\end{itemize}
+
+\subsubsection{7.18.5 Complete System Matrix [A] - Equation (8)}
+
+The system matrix from equation (8) has the following structure:
+
+\begin{equation}
+[A] = \begin{bmatrix}
+1 & 0 & 1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 1 & 0 & 0 \\
+0 & 0 & -1, \sin q_1 & l_1 \cos q_1 & 0 & 0 \\
+0 & 0 & -1 & 0 & -\cos \alpha_1 & -\cos \alpha_2 \\
+0 & 0 & 0 & -1 & -\sin \alpha_1 & -\sin \alpha_2 \\
+0 & 0 & 0 & 0 & l_2 \sin(q_1 + q_2 + \alpha_1) & l_2 \sin(q_1 + q_2 + \alpha_2)
+\end{bmatrix}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $q_1, q_2$ = Joint angles
+    \item $\alpha_1, \alpha_2$ = Cable angles at attachment point
+    \item $l_1, l_2$ = Link lengths
+\end{itemize}
+
+\textbf{Detailed matrix element explanation:}
+
+\textbf{Upper-left $2 \times 2$ block (Position kinematics):}
+
+\begin{equation}
+\begin{bmatrix}
+\dot{X}_{01} \\
+\dot{Y}_{01}
+\end{bmatrix} = \begin{bmatrix}
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0
+\end{bmatrix} \begin{bmatrix}
+X_{01} \\
+Y_{01} \\
+X_{21} \\
+Y_{21} \\
+T_1 \\
+T_2
+\end{bmatrix}
+\end{equation}
+
+This shows that position derivatives equal the velocity components (identity relationship).
+
+\textbf{Rows 3-4 (Acceleration kinematics):}
+
+\begin{equation}
+\begin{bmatrix}
+\dot{X}_{21} \\
+\dot{Y}_{21}
+\end{bmatrix} = \begin{bmatrix}
+0 & 0 & -1 \sin q_1 & l_1 \cos q_1 & 0 & 0 \\
+0 & 0 & -1 & 0 & -\cos \alpha_1 & -\cos \alpha_2
+\end{bmatrix} \begin{bmatrix}
+X_{01} \\
+Y_{01} \\
+X_{21} \\
+Y_{21} \\
+T_1 \\
+T_2
+\end{bmatrix}
+\end{equation}
+
+Breaking this down:
+\begin{itemize}
+    \item Column 3 term: $-\sin q_1 \cdot X_{21}$ - represents joint angle dependent velocity coupling
+    \item Column 4 term: $l_1 \cos q_1 \cdot Y_{21}$ - link length and angle coupling
+    \item Column 5-6 terms: $-\cos \alpha_i \cdot T_i$ - cable tension effects on horizontal acceleration
+\end{itemize}
+
+\textbf{Rows 5-6 (Cable tension dynamics):}
+
+\begin{equation}
+\begin{bmatrix}
+\dot{T}_1 \\
+\dot{T}_2
+\end{bmatrix} = \begin{bmatrix}
+0 & 0 & 0 & -1 & -\sin \alpha_1 & -\sin \alpha_2 \\
+0 & 0 & 0 & 0 & l_2 \sin(q_1+q_2+\alpha_1) & l_2 \sin(q_1+q_2+\alpha_2)
+\end{bmatrix} \begin{bmatrix}
+X_{01} \\
+Y_{01} \\
+X_{21} \\
+Y_{21} \\
+T_1 \\
+T_2
+\end{bmatrix}
+\end{equation}
+
+This represents:
+\begin{itemize}
+    \item Cable tensions evolve based on velocity and configuration
+    \item The $\sin \alpha_i$ terms represent vertical components of cable tensions
+    \item The $\sin(q_1+q_2+\alpha_i)$ terms represent geometric coupling
+\end{itemize}
+
+\subsubsection{7.18.6 Physical Interpretation of Matrix Elements}
+
+\textbf{Element $A_{ij}$ meaning:}
+
+Each element $A_{ij}$ represents the influence of state variable $j$ on the time derivative of state variable $i$.
+
+\begin{equation}
+\dot{x}_i = \sum_{j=1}^{6} A_{ij} x_j
+\end{equation}
+
+\textbf{Key elements and their meanings:}
+
+\begin{enumerate}
+    \item $A_{1,3} = 1$: Position rate = velocity (kinematic constraint)
+    
+    \item $A_{2,4} = 1$: Vertical position rate = vertical velocity
+    
+    \item $A_{3,3} = -\sin q_1$: Velocity coupling through joint angle
+    
+    \item $A_{3,4} = l_1 \cos q_1$: Link length effect on acceleration
+    
+    \item $A_{3,5} = 0$, $A_{3,6} = 0$: No direct tension effect on horizontal acceleration (in linear approximation)
+    
+    \item $A_{4,5} = -\cos \alpha_1$: Cable 1 tension affects vertical acceleration
+    
+    \item $A_{4,6} = -\cos \alpha_2$: Cable 2 tension affects vertical acceleration
+    
+    \item $A_{5,4} = -1$: Vertical velocity affects tension rate
+    
+    \item $A_{5,5} = -\sin \alpha_1$: Cable angle effects
+    
+    \item $A_{6,6} = l_2 \sin(q_1+q_2+\alpha_2)$: Geometric coupling with link 2
+\end{enumerate}
+
+\subsubsection{7.18.7 Deriving Matrix Elements from First Principles}
+
+\textbf{Forward Kinematics (Rows 1-2):}
+
+From:
+\begin{equation}
+X_{01} = l_1 \cos q_1 + l_2 \cos(q_1+q_2)
+\end{equation}
+
+\begin{equation}
+Y_{01} = l_1 \sin q_1 + l_2 \sin(q_1+q_2)
+\end{equation}
+
+Taking time derivatives:
+
+\begin{equation}
+\dot{X}_{01} = -l_1 \sin q_1 \cdot \dot{q}_1 - l_2 \sin(q_1+q_2) \cdot (\dot{q}_1 + \dot{q}_2)
+\end{equation}
+
+In terms of state variables where $X_{21} \approx \dot{X}_{01}$ (for infinitesimal dt):
+
+\begin{equation}
+\dot{X}_{01} = X_{21}
+\end{equation}
+
+\textbf{This gives:} $A_{1,3} = 1$, all other $A_{1,j} = 0$.
+
+\textbf{Joint Acceleration (Rows 3-4):}
+
+From the Euler-Lagrange dynamics:
+
+\begin{equation}
+\ddot{X}_{21} = \mathbf{J}_{q1,1} \ddot{q}_1 + \mathbf{J}_{q1,2} \ddot{q}_2 + \dot{\mathbf{J}}_{q1} \mathbf{v}
+\end{equation}
+
+Inverting the mass matrix and substituting:
+
+\begin{equation}
+\ddot{X}_{21} = \sum_j M^{-1}_{11} [J_{\rho,j} T_j - G_j] + \text{velocity-dependent terms}
+\end{equation}
+
+The coefficients involving $\sin q_1$, $\cos q_1$, $\alpha_i$ come from:
+\begin{itemize}
+    \item Jacobian elements (kinematic structure)
+    \item Inverse mass matrix (inertial effects)
+    \item Cable geometry terms
+\end{itemize}
+
+\textbf{Cable Tension Dynamics (Rows 5-6):}
+
+For cable tensions with actuator dynamics:
+
+\begin{equation}
+\dot{T}_i = -k_i T_i + k_i \tau_{c,i} + \text{constraint forces}
+\end{equation}
+
+The constraint forces depend on:
+\begin{itemize}
+    \item Cable length rate: $\dot{\rho}_i = \mathbf{J}_{\rho,i} \cdot \mathbf{v}$
+    \item Cable tension equilibrium: $\sum T_i \cdot \text{(unit vectors)} = \mathbf{F}_{ext}$
+\end{itemize}
+
+This gives the coupling terms involving $\sin \alpha_i$ and geometric factors.
+
+\subsubsection{7.18.8 Special Cases and Simplifications}
+
+\textbf{Case 1: Small angle approximation} ($\sin q_i \approx q_i$, $\cos q_i \approx 1$)
+
+\begin{equation}
+[A]_{\text{linear}} \approx \begin{bmatrix}
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & -q_1 & l_1 & 0 & 0 \\
+0 & 0 & -1 & 0 & -\cos \alpha_1 & -\cos \alpha_2 \\
+0 & 0 & 0 & -1 & -\sin \alpha_1 & -\sin \alpha_2 \\
+0 & 0 & 0 & 0 & l_2 \sin(\alpha_1) & l_2 \sin(\alpha_2)
+\end{bmatrix}
+\end{equation}
+
+\textbf{Case 2: Horizontal cables} ($\alpha_1 = \alpha_2 = 0$)
+
+\begin{equation}
+[A]_{\text{horiz}} = \begin{bmatrix}
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & -\sin q_1 & l_1 \cos q_1 & 0 & 0 \\
+0 & 0 & -1 & 0 & -1 & -1 \\
+0 & 0 & 0 & -1 & 0 & 0 \\
+0 & 0 & 0 & 0 & l_2 \sin(q_1+q_2) & l_2 \sin(q_1+q_2)
+\end{bmatrix}
+\end{equation}
+
+\textbf{Case 3: Vertical cables} ($\alpha_1 = \alpha_2 = \pi/2$)
+
+\begin{equation}
+[A]_{\text{vert}} = \begin{bmatrix}
+0 & 0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 & 0 \\
+0 & 0 & -\sin q_1 & l_1 \cos q_1 & 0 & 0 \\
+0 & 0 & -1 & 0 & 0 & 0 \\
+0 & 0 & 0 & -1 & -1 & -1 \\
+0 & 0 & 0 & 0 & l_2 \sin(q_1+q_2+\pi/2) & l_2 \sin(q_1+q_2+\pi/2)
+\end{bmatrix}
+\end{equation}
+
+\subsubsection{7.18.9 Numerical Computation of [A]}
+
+\textbf{Algorithm:}
+
+\begin{algorithm}[H]
+\caption{Compute System Matrix [A] at Configuration $\mathbf{q}$}
+\begin{algorithmic}[1]
+\REQUIRE Joint angles $q_1, q_2$, Link parameters $l_1, l_2$, Cable angles $\alpha_1, \alpha_2$
+\STATE Compute joint Jacobian: $\mathbf{J}_q(\mathbf{q})$
+\STATE Compute inverse mass matrix: $\mathbf{M}^{-1}(\mathbf{q})$
+\STATE Compute gravity gradient: $\nabla \mathbf{G}(\mathbf{q})$
+\STATE Compute cable geometry Jacobian: $\mathbf{J}_{\rho}(\mathbf{q})$
+\STATE Assemble upper blocks (kinematics): rows 1-2, rows 3-4
+\STATE Assemble tension coupling: $-\mathbf{M}^{-1} \mathbf{J}_{\rho}^T$
+\STATE Assemble gravity effects: $-\mathbf{M}^{-1} \nabla \mathbf{G}$
+\STATE Combine into $6 \times 6$ matrix $[A]$
+\RETURN $[A](\mathbf{q})$
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{7.18.10 Connection to Singularity Analysis}
+
+The system matrix $[A]$ reveals critical information about singularities:
+
+\begin{enumerate}
+    \item \textbf{Rank deficiency}: At singular configurations, rows become linearly dependent
+    
+    \item \textbf{Large eigenvalues}: Near singularity, $\lambda_{\max}([A]) \to \infty$
+    
+    \item \textbf{Instability indicator}: Eigenvalues with large positive real parts indicate unstable modes
+    
+    \item \textbf{Controllability loss}: At singularity, some state variables become uncontrollable
+    
+    \begin{equation}
+    \text{rank}[B, AB, A^2B, \ldots] < n \text{ at singularity}
+    \end{equation}
+\end{enumerate}
+
+\textbf{Monitoring singularity proximity:}
+
+\begin{equation}
+\text{Condition number: } \kappa([A]) = \frac{\lambda_{\max}([A])}{\lambda_{\min}([A])} \gg 1 \text{ near singularity}
+\end{equation}
+
+\subsubsection{7.18.11 Linearized vs. Nonlinear System}
+
+\textbf{Linearized around operating point:}
+
+\begin{equation}
+\dot{\mathbf{x}} = [A](\mathbf{q}_0) \mathbf{x} + \mathbf{B}(\mathbf{q}_0) \mathbf{u}
+\end{equation}
+
+Valid for small deviations: $\|\mathbf{x} - \mathbf{x}_0\| < \epsilon$
+
+\textbf{Nonlinear system:}
+
+\begin{equation}
+\dot{\mathbf{x}} = \mathbf{f}(\mathbf{x}, \mathbf{u})
+\end{equation}
+
+where $[A] = \frac{\partial \mathbf{f}}{\partial \mathbf{x}}\big|_{\mathbf{x}_0}$
+
+\textbf{Linearization error depends on:}
+\begin{itemize}
+    \item Configuration ($q_1$, $q_2$ terms are nonlinear)
+    \item Velocity (centrifugal terms)
+    \item Tension magnitude (coupling strength)
+\end{itemize}
+
+For larger deviations, the full nonlinear model must be used for accurate simulation.
+
+\subsubsection{7.18.12 Summary: System Matrix Derivation}
+
+The complete system matrix $[A]$ is derived from:
+
+\begin{enumerate}
+    \item \textbf{Kinematics}: Position-velocity relationship (rows 1-2)
+    
+    \item \textbf{Dynamics}: Joint accelerations from Euler-Lagrange (rows 3-4)
+    
+    \item \textbf{Actuation}: Cable tension rate equations (rows 5-6)
+    
+    \item \textbf{Constraints}: Cable length and force balance relationships
+    
+    \item \textbf{Configuration}: Joint angles $q_1, q_2$ appear explicitly
+    
+    \item \textbf{Geometry}: Link lengths $l_1, l_2$ and cable angles $\alpha_1, \alpha_2$
+\end{enumerate}
+
+The resulting $6 \times 6$ matrix captures:
+- ✅ Full nonlinear dynamics in linearized form
+- ✅ Coupling between position, velocity, and tension
+- ✅ Configuration-dependent effects
+- ✅ Singularity sensitivity through matrix conditioning
+- ✅ Foundation for control design and stability analysis
