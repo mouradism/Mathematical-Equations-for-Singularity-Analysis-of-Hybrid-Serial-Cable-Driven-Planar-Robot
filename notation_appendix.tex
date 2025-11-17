@@ -1,0 +1,336 @@
+\appendix
+\section{Notation and Symbol Reference}
+
+This appendix provides a comprehensive reference for all mathematical symbols, variables, and notation used throughout this document. This standardized notation ensures consistency and eliminates ambiguity in mathematical derivations and implementation.
+
+\subsection{Robot Geometry and Configuration}
+
+\begin{table}[h!]
+\centering
+\caption{Robot Geometric Parameters}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Units} & \textbf{Type} \\
+\hline
+$l_1$ & Length of first link (base to elbow) & m & Fixed parameter \\
+$l_2$ & Length of second link (elbow to end-effector) & m & Fixed parameter \\
+$L$ & Half-distance between cable anchor points & m & Fixed parameter \\
+$q_1$ & First joint angle (base joint) & rad & Variable \\
+$q_2$ & Second joint angle (elbow joint) & rad & Variable \\
+$\bm{q}$ & Joint angle vector $[q_1, q_2]^T$ & rad & Vector variable \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Cable System Parameters}
+
+\begin{table}[h!]
+\centering
+\caption{Cable System Notation}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Units} & \textbf{Type} \\
+\hline
+$\rho_1$ & Left cable length (variable, motor-controlled) & m & Control input \\
+$\rho_2$ & Right cable length (variable, motor-controlled) & m & Control input \\
+$\bm{\rho}$ & Cable length vector $[\rho_1, \rho_2]^T$ & m & Vector variable \\
+$\alpha_1$ & Left cable angle (from horizontal) & rad & Computed variable \\
+$\alpha_2$ & Right cable angle (from horizontal) & rad & Computed variable \\
+$T_1$ & Left cable tension force & N & Control input \\
+$T_2$ & Right cable tension force & N & Control input \\
+$\bm{T}$ & Cable tension vector $[T_1, T_2]^T$ & N & Vector variable \\
+\hline
+\multicolumn{4}{|l|}{\textbf{Cable Tension Constraints:}} \\
+\hline
+$T_1 \geq 0$ & Non-negative left cable tension constraint & - & Physical constraint \\
+$T_2 \geq 0$ & Non-negative right cable tension constraint & - & Physical constraint \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Coordinate Frames and Positions}
+
+\begin{table}[h!]
+\centering
+\caption{Coordinate System Notation}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Units} & \textbf{Type} \\
+\hline
+$\{0\}$ & Base coordinate frame (world frame) & - & Fixed frame \\
+$\{1\}$ & First joint coordinate frame & - & Moving frame \\
+$\{2\}$ & End-effector coordinate frame & - & Moving frame \\
+$O$ & Origin of base frame (joint 1 center) & - & Fixed point \\
+$A$ & Elbow joint center (joint 2 center) & - & Moving point \\
+$M$ & End-effector point (cable attachment) & - & Moving point \\
+$x_M, y_M$ & End-effector position coordinates & m & Computed variables \\
+$\bm{p}_M$ & End-effector position vector $[x_M, y_M]^T$ & m & Vector variable \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Cable Anchor Points and Geometry}
+
+\begin{table}[h!]
+\centering
+\caption{Cable Anchor Point Notation}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Units} & \textbf{Type} \\
+\hline
+$A_1$ & Left cable anchor point position & - & Fixed point \\
+$A_2$ & Right cable anchor point position & - & Fixed point \\
+$\bm{A}_1$ & Left anchor position vector $[-L, 0]^T$ & m & Fixed vector \\
+$\bm{A}_2$ & Right anchor position vector $[L, 0]^T$ & m & Fixed vector \\
+$\bm{u}_1$ & Left cable unit direction vector & - & Computed vector \\
+$\bm{u}_2$ & Right cable unit direction vector & - & Computed vector \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Denavit-Hartenberg Parameters}
+
+\begin{table}[h!]
+\centering
+\caption{DH Parameter Notation (Distinct from Cable Angles)}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Units} & \textbf{Type} \\
+\hline
+$a_i$ & Link length (DH parameter) & m & Fixed parameter \\
+$\alpha_{DH,i}$ & Link twist angle (DH parameter) & rad & Fixed parameter \\
+$d_i$ & Link offset (DH parameter) & m & Fixed parameter \\
+$\theta_i$ & Joint angle (DH parameter) & rad & Variable \\
+\hline
+\multicolumn{4}{|l|}{\textbf{Specific Values for 2-DOF Planar Robot:}} \\
+\hline
+$a_1 = l_1$ & First link length & m & $a_1 = l_1$ \\
+$a_2 = l_2$ & Second link length & m & $a_2 = l_2$ \\
+$\alpha_{DH,1} = 0$ & First link twist (planar motion) & rad & 0 \\
+$\alpha_{DH,2} = 0$ & Second link twist (planar motion) & rad & 0 \\
+$d_1 = 0$ & First joint offset (revolute joint) & m & 0 \\
+$d_2 = 0$ & Second joint offset (revolute joint) & m & 0 \\
+$\theta_1 = q_1$ & First joint variable & rad & Variable \\
+$\theta_2 = q_2$ & Second joint variable & rad & Variable \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Transformation Matrices}
+
+\begin{table}[h!]
+\centering
+\caption{Transformation Matrix Notation}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Dimensions} & \textbf{Meaning} \\
+\hline
+$\bm{T}_j^i$ & Transform from frame $\{i\}$ to frame $\{j\}$ & $3 \times 3$ & Homogeneous transform \\
+$\bm{T}_1^0$ & Base to first joint transformation & $3 \times 3$ & Fixed to moving \\
+$\bm{T}_2^1$ & First to second joint transformation & $3 \times 3$ & Moving to moving \\
+$\bm{T}_2^0$ & Base to end-effector transformation & $3 \times 3$ & Complete chain \\
+$\bm{R}_j^i$ & Rotation matrix from frame $\{i\}$ to $\{j\}$ & $2 \times 2$ & Rotation only \\
+$\bm{p}_j^i$ & Position vector of frame $\{j\}$ in frame $\{i\}$ & $2 \times 1$ & Translation only \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Kinematics and Dynamics}
+
+\begin{table}[h!]
+\centering
+\caption{Kinematic and Dynamic Variables}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Units} & \textbf{Type} \\
+\hline
+$\dot{q}_1, \dot{q}_2$ & Joint angular velocities & rad/s & Time derivatives \\
+$\dot{\bm{q}}$ & Joint velocity vector $[\dot{q}_1, \dot{q}_2]^T$ & rad/s & Vector variable \\
+$\dot{\rho}_1, \dot{\rho}_2$ & Cable length change rates & m/s & Time derivatives \\
+$\dot{\bm{\rho}}$ & Cable velocity vector $[\dot{\rho}_1, \dot{\rho}_2]^T$ & m/s & Vector variable \\
+$\dot{x}_M, \dot{y}_M$ & End-effector velocity components & m/s & Computed variables \\
+$\dot{\bm{x}}$ & End-effector velocity vector $[\dot{x}_M, \dot{y}_M]^T$ & m/s & Vector variable \\
+$\tau_1, \tau_2$ & Joint torques (if used) & N$\cdot$m & Control inputs \\
+$\bm{\tau}$ & Joint torque vector (if used) & N$\cdot$m & Vector variable \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Jacobian Matrices}
+
+\begin{table}[h!]
+\centering
+\caption{Jacobian Matrix Notation}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Dimensions} & \textbf{Physical Meaning} \\
+\hline
+$\bm{J}_q$ & Serial joint Jacobian & $2 \times 2$ & $\frac{\partial \bm{x}}{\partial \bm{q}}$ \\
+$\bm{J}_{\rho}$ & Cable Jacobian & $2 \times 2$ & $\frac{\partial \bm{x}}{\partial \bm{\rho}}$ \\
+$\bm{J}$ & Complete system Jacobian & $2 \times 4$ & $[\bm{J}_q \quad \bm{J}_{\rho}]$ \\
+$\bm{J}_{red}$ & Reduced Jacobian (constrained system) & $2 \times 2$ & Effective joint-space Jacobian \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Constraint Equations}
+
+\begin{table}[h!]
+\centering
+\caption{Constraint Equation Notation}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Dimensions} & \textbf{Type} \\
+\hline
+$g_1(\bm{q}, \rho_1)$ & Left cable geometric constraint & scalar & Nonlinear function \\
+$g_2(\bm{q}, \rho_2)$ & Right cable geometric constraint & scalar & Nonlinear function \\
+$\bm{g}(\bm{q}, \bm{\rho})$ & Constraint vector $[g_1, g_2]^T$ & $2 \times 1$ & Vector function \\
+$\bm{G}_q$ & Constraint Jacobian w.r.t. joints & $2 \times 2$ & $\frac{\partial \bm{g}}{\partial \bm{q}}$ \\
+$\bm{G}_{\rho}$ & Constraint Jacobian w.r.t. cables & $2 \times 2$ & $\frac{\partial \bm{g}}{\partial \bm{\rho}}$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Forces and Unit Vectors}
+
+\begin{table}[h!]
+\centering
+\caption{Force and Direction Vectors}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Units} & \textbf{Type} \\
+\hline
+$\bm{F}_1$ & Left cable force vector & N & Force vector \\
+$\bm{F}_2$ & Right cable force vector & N & Force vector \\
+$\bm{F}_{cable}$ & Total cable force $\bm{F}_1 + \bm{F}_2$ & N & Resultant force \\
+$\bm{F}_{ext}$ & External force at end-effector & N & Applied load \\
+$F_{ext,x}, F_{ext,y}$ & External force components & N & Force components \\
+$P_1, P_2$ & Gravitational forces at centers of mass & N & Force magnitudes \\
+$G_1, G_2$ & Centers of mass of links 1 and 2 & - & Points \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Mathematical Functions and Operators}
+
+\begin{table}[h!]
+\centering
+\caption{Mathematical Operations and Functions}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Domain/Range} & \textbf{Notes} \\
+\hline
+$\text{atan2}(y,x)$ & Four-quadrant arctangent function & $(-\pi, \pi]$ & Robust angle calculation \\
+$\|\bm{v}\|$ & Euclidean norm of vector $\bm{v}$ & $[0, \infty)$ & Vector magnitude \\
+$\det(\bm{A})$ & Determinant of matrix $\bm{A}$ & $\mathbb{R}$ & Scalar value \\
+$\bm{A}^{-1}$ & Matrix inverse of $\bm{A}$ & Same size as $\bm{A}$ & When $\det(\bm{A}) \neq 0$ \\
+$\bm{A}^T$ & Matrix transpose of $\bm{A}$ & Transposed dimensions & Row-column exchange \\
+$\frac{\partial f}{\partial x}$ & Partial derivative of $f$ w.r.t. $x$ & Varies & Rate of change \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Singularity Analysis Notation}
+
+\begin{table}[h!]
+\centering
+\caption{Singularity Analysis Symbols}
+\begin{tabular}{|c|l|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Condition} & \textbf{Physical Meaning} \\
+\hline
+Type I & Serial chain singularity & $\det(\bm{J}_q) = 0$ & Loss of joint DOF \\
+Type II & Cable singularity & $\det(\bm{G}_{\rho}) = 0$ & Cable constraints dependent \\
+Type III & Combined singularity & $\det(\bm{J}_{red}) = 0$ & System-level singularity \\
+$q_2 = 0$ & Fully extended configuration & $\sin(q_2) = 0$ & Serial arm straight \\
+$q_2 = \pi$ & Fully folded configuration & $\sin(q_2) = 0$ & Serial arm folded back \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Important Relationships and Formulas}
+
+\begin{table}[h!]
+\centering
+\caption{Key Mathematical Relationships}
+\begin{tabular}{|c|l|}
+\hline
+\textbf{Category} & \textbf{Formula} \\
+\hline
+\multirow{4}{*}{Forward Kinematics} & $x_M = l_1\cos q_1 + l_2\cos(q_1 + q_2)$ \\
+& $y_M = l_1\sin q_1 + l_2\sin(q_1 + q_2)$ \\
+& $\rho_1 = \sqrt{(x_M + L)^2 + y_M^2}$ \\
+& $\rho_2 = \sqrt{(x_M - L)^2 + y_M^2}$ \\
+\hline
+\multirow{2}{*}{Cable Angles} & $\alpha_1 = \text{atan2}(y_M, x_M + L)$ \\
+& $\alpha_2 = \text{atan2}(y_M, x_M - L)$ \\
+\hline
+\multirow{2}{*}{Cable Unit Vectors} & $\bm{u}_1 = \frac{1}{\rho_1}[x_M + L, y_M]^T$ \\
+& $\bm{u}_2 = \frac{1}{\rho_2}[x_M - L, y_M]^T$ \\
+\hline
+\multirow{2}{*}{Velocity Kinematics} & $\dot{\bm{x}} = \bm{J}_q \dot{\bm{q}} + \bm{J}_{\rho} \dot{\bm{\rho}}$ \\
+& $\dot{\bm{x}} = \bm{J}_{red} \dot{\bm{q}}$ (constrained) \\
+\hline
+Singularity Conditions & $\det(\bm{J}_q) = l_1 l_2 \sin q_2 = 0$ \\
+\hline
+\multirow{3}{*}{Cable Tension Constraints} & $T_1 \geq 0, T_2 \geq 0$ (Non-negative tensions) \\
+& $\sin(\alpha_2 - \alpha_1) \neq 0$ (Non-parallel cables) \\
+& Force equilibrium: $T_1 \bm{u}_1 + T_2 \bm{u}_2 + \bm{F}_{ext} = \bm{0}$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Workspace Definitions}
+
+\begin{table}[h!]
+\centering
+\caption{Workspace and Constraint Set Notation}
+\begin{tabular}{|c|l|}
+\hline
+\textbf{Symbol} & \textbf{Description} \\
+\hline
+$\mathcal{W}_{kinematic}$ & Kinematic workspace (reachable by serial chain) \\
+$\mathcal{W}_{feasible}$ & Feasible workspace (positive cable tensions) \\
+$\mathcal{W}_{cable-limited}$ & Cable-limited regions (negative tensions required) \\
+$\mathcal{W}_{singular}$ & Singular configurations ($\det(\bm{J}) = 0$) \\
+\hline
+\multicolumn{2}{|l|}{\textbf{Mathematical Definitions:}} \\
+\hline
+$\mathcal{W}_{kinematic}$ & $\{(x_M, y_M) : x_M^2 + y_M^2 \leq (l_1 + l_2)^2\}$ \\
+$\mathcal{W}_{feasible}$ & $\{(x_M, y_M) : T_1 \geq 0 \text{ and } T_2 \geq 0\}$ \\
+$\mathcal{W}_{cable-limited}$ & $\{(x_M, y_M) : T_1 < 0 \text{ or } T_2 < 0\}$ \\
+$\mathcal{W}_{singular}$ & $\{(x_M, y_M) : q_2 = n\pi, n \in \mathbb{Z}\}$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Notation Conventions}
+
+\begin{itemize}
+    \item \textbf{Scalars}: Regular italic font (e.g., $q_1$, $l_1$, $\rho_1$)
+    \item \textbf{Vectors}: Bold lowercase (e.g., $\bm{q}$, $\bm{p}_M$, $\bm{u}_1$)
+    \item \textbf{Matrices}: Bold uppercase (e.g., $\bm{T}_1^0$, $\bm{J}_q$, $\bm{R}$)
+    \item \textbf{Frames}: Curly braces (e.g., $\{0\}$, $\{1\}$, $\{2\}$)
+    \item \textbf{Points}: Regular uppercase (e.g., $O$, $A$, $M$, $A_1$, $A_2$)
+    \item \textbf{Subscripts}: Parameter index or frame reference
+    \item \textbf{Superscripts}: Reference frame for transformations
+    \item \textbf{Dots}: Time derivatives (e.g., $\dot{q}_1$, $\dot{\bm{x}}$)
+\end{itemize}
+
+\subsection{Critical Distinctions}
+
+\begin{table}[h!]
+\centering
+\caption{Commonly Confused Notation - Key Distinctions}
+\begin{tabular}{|c|c|l|}
+\hline
+\textbf{Symbol} & \textbf{NOT} & \textbf{Distinction} \\
+\hline
+$l_1, l_2$ & $\rho_1, \rho_2$ & Link lengths (fixed) vs Cable lengths (variable) \\
+$\alpha_1, \alpha_2$ & $\alpha_{DH,1}, \alpha_{DH,2}$ & Cable angles vs DH twist parameters \\
+$T_1, T_2$ & $\tau_1, \tau_2$ & Cable tensions vs Joint torques \\
+$\bm{J}_{\rho}$ & $\bm{J}_l$ & Cable Jacobian (corrected notation) \\
+$\bm{G}_{\rho}$ & $\bm{G}_l$ & Constraint Jacobian (corrected notation) \\
+\hline
+\end{tabular}
+\end{table}

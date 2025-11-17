@@ -1,0 +1,111 @@
+# LaTeX build artifacts
+*.pdf
+*.dvi
+*.ps
+*.eps
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex
+*.bbl
+*.blg
+*.toc
+*.lof
+*.lot
+*.idx
+*.ilg
+*.ind
+*.ist
+*.glg
+*.glo
+*.gls
+*.dpth
+*.md5
+*.auxlock
+*.maf
+*.makefile
+
+# LaTeX intermediate directories
+/build/
+/output/
+*.backup
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.project
+.pydevproject
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+.directory
+Desktop.ini
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.~*
+
+# Project specific
+*.log
+.env
+config.local.*
+node_modules/
+
+# VS Code workspace
+.vscode/launch.json
+.vscode/settings.json
+
+# Documentation builds
+docs/_build/
+site/
+
+# Cache
+.cache/

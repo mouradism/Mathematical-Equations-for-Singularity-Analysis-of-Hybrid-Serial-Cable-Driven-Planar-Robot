@@ -1,0 +1,2018 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{bm}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{subfig}
+\usepackage{multirow}
+\usepackage{color}
+\usepackage{xcolor}
+
+\geometry{margin=1in}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Singularity Analysis Equations}
+\lhead{Hybrid Serial-Cable Driven Robot}
+\cfoot{\thepage}
+
+\title{Mathematical Equations for Singularity Analysis of \\
+Hybrid Serial-Cable Driven Planar Robot}
+\author{Implementation Reference Document}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Robot Configuration and Parameters}
+
+\subsection{System Description}
+The hybrid serial-cable driven planar robot combines a serial manipulator with cable actuation. The system comprises:
+
+\begin{itemize}
+    \item A 2-DOF serial kinematic chain (links connected by revolute joints)
+    \item Two cables both attached to the end-effector point M
+    \item Fixed cable anchor points at positions $(-L, 0)$ and $(L, 0)$
+    \item Cable actuation providing additional forces and constraints at point M
+    \item Hybrid actuation: joint motors + cable tensions
+\end{itemize}
+
+\textbf{Key Characteristics:}
+\begin{itemize}
+    \item The serial chain provides the primary positioning mechanism
+    \item Cables apply forces directly to the end-effector point M
+    \item Cable lengths vary as the serial chain moves
+    \item Cable tensions can assist or modify the motion capabilities
+    \item System redundancy allows for singularity avoidance
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\input{robot_diagram.tex}
+\caption{Schematic of the hybrid serial-cable driven planar robot. Cable angles $\alpha_1$ and $\alpha_2$ are computed using $\text{atan2}$ for robust quadrant handling.}
+\label{fig:robot_config}
+\end{figure}
+
+The hybrid configuration provides:
+\begin{enumerate}
+    \item Extended workspace through serial chain reach
+    \item Enhanced stiffness and precision via cable pre-tensioning  
+    \item Singularity avoidance through redundant actuation
+    \item Improved dynamic performance with distributed actuation
+\end{enumerate}
+
+\subsection{Specific Robot Configuration}
+Based on the schematic in Figure \ref{fig:robot_config}, the robot has the following characteristics:
+
+\subsubsection{Serial Chain}
+\begin{itemize}
+    \item Two revolute joints with angles $q_1$ and $q_2$
+    \item Link lengths: $l_1$ and $l_2$  
+    \item Joint centers at $O$ (base), $A$ (elbow), and $M$ (end-effector)
+    \item Centers of mass at $G_1$ and $G_2$
+\end{itemize}
+
+\subsubsection{Cable System}
+\begin{itemize}
+    \item Two cables attached to the end-effector point M
+    \item Fixed cable anchor points positioned at $(-L, 0)$ and $(L, 0)$ 
+    \item Both cables connect from their respective anchor points to point M
+    \item Cable tensions $T_1$ and $T_2$ act directly on the end-effector
+    \item Cable angles $\alpha_1$ and $\alpha_2$ measured from horizontal to cable directions
+\end{itemize}
+
+\subsubsection{Force System}  
+\begin{itemize}
+    \item Gravitational forces $P_1$ and $P_2$ acting at centers of mass $G_1$ and $G_2$
+    \item Cable tensions $T_1$ and $T_2$ both acting at end-effector point M
+    \item Cable forces act along the directions from M to respective anchor points
+    \item Joint torques from serial actuators (if present)
+    \item Net force equilibrium at point M from both cable tensions
+\end{itemize}
+
+\subsubsection{Cable Force Vectors}
+The cable tension forces acting on the end-effector are:
+\begin{align}
+\bm{F}_1 &= T_1 \bm{u}_1 = T_1 \frac{\bm{A}_1 - \bm{p}_M}{\rho_1} = -T_1 \frac{\bm{p}_M - \bm{A}_1}{\rho_1} \\
+\bm{F}_2 &= T_2 \bm{u}_2 = T_2 \frac{\bm{A}_2 - \bm{p}_M}{\rho_2} = -T_2 \frac{\bm{p}_M - \bm{A}_2}{\rho_2}
+\end{align}
+
+The total cable force on the end-effector is:
+\begin{align}
+\bm{F}_{cable} &= \bm{F}_1 + \bm{F}_2 \\
+&= -T_1 \frac{1}{\rho_1}\begin{bmatrix} x_M + L \\ y_M \end{bmatrix} - T_2 \frac{1}{\rho_2}\begin{bmatrix} x_M - L \\ y_M \end{bmatrix}
+\end{align}
+
+\subsection{Robot Parameters}
+For the specific configuration shown in Figure \ref{fig:robot_config}:
+\begin{align}
+n_j &= 2 \quad \text{(number of serial joints)} \\
+n_c &= 2 \quad \text{(number of cables)} \\
+n_{dof} &= 2 \quad \text{(planar positioning: } x, y \text{)} \\
+l_1, l_2 &= \text{link lengths of serial chain} \\
+L &= \text{half-span of cable anchor points} \\
+m_1, m_2 &= \text{masses of links 1 and 2} \\
+I_1, I_2 &= \text{moments of inertia about centers of mass}
+\end{align}
+
+\subsubsection{Geometric Parameters}
+\begin{align}
+\text{Base frame origin: } &\quad O = (0, 0) \\
+\text{Cable anchor points: } &\quad A_1 = (-L, 0), \quad A_2 = (L, 0) \\
+\text{Joint 1 position: } &\quad \text{at origin } O \\
+\text{Joint 2 position: } &\quad A = (l_1 \cos q_1, l_1 \sin q_1) \\
+\text{End-effector position: } &\quad M = A + (l_2 \cos(q_1 + q_2), l_2 \sin(q_1 + q_2))
+\end{align}
+
+\subsubsection{Cable Geometry}
+\begin{align}
+\text{Cable 1 length: } &\quad \rho_1 = \|M - A_1\| \\
+\text{Cable 2 length: } &\quad \rho_2 = \|M - A_2\| \\
+\text{Cable 1 angle: } &\quad \alpha_1 = \text{atan2}(y_M, x_M + L) \\
+\text{Cable 2 angle: } &\quad \alpha_2 = \text{atan2}(y_M, x_M - L)
+\end{align}
+
+\subsection{Coordinate Systems}
+The robot coordinate systems are defined as follows:
+\begin{align}
+\{O\} &: \text{base frame (fixed world frame)} \\
+\{E\} &: \text{end-effector frame (moving frame)} \\
+\{C_i\} &: \text{cable attachment frame } i, \quad i = 1, 2, \ldots, n_c \\
+\{J_j\} &: \text{joint frame } j, \quad j = 1, 2, \ldots, n_j
+\end{align}
+
+\subsubsection{Transformation Matrices}
+Homogeneous transformation matrices provide a unified framework for representing both rotation and translation in robotics. For the hybrid serial-cable driven planar robot, these transformations are essential for relating different coordinate frames.
+
+\textbf{General Homogeneous Transformation:}
+The homogeneous transformation from frame $\{i\}$ to frame $\{j\}$ is:
+\begin{align}
+\bm{T}_j^i &= \begin{bmatrix}
+\bm{R}_j^i & \bm{p}_j^i \\
+\bm{0}^T & 1
+\end{bmatrix}
+\end{align}
+
+Where:
+\begin{itemize}
+    \item $\bm{R}_j^i \in SO(2)$: rotation matrix from frame $\{i\}$ to frame $\{j\}$
+    \item $\bm{p}_j^i \in \mathbb{R}^2$: position vector of origin of frame $\{j\}$ expressed in frame $\{i\}$
+    \item $\bm{0}^T = [0 \quad 0]$: zero row vector
+\end{itemize}
+
+\textbf{2D Planar Transformation:}
+For planar motion, the transformation matrix becomes:
+\begin{align}
+\bm{T}_j^i &= \begin{bmatrix}
+\cos\theta_{ij} & -\sin\theta_{ij} & x_{ij} \\
+\sin\theta_{ij} & \cos\theta_{ij} & y_{ij} \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+Where:
+\begin{align}
+\theta_{ij} &: \text{rotation angle from frame } \{i\} \text{ to frame } \{j\} \\
+x_{ij}, y_{ij} &: \text{translation components from frame } \{i\} \text{ to frame } \{j\}
+\end{align}
+
+\textbf{Properties of Transformation Matrices:}
+\begin{enumerate}
+    \item \textbf{Composition:} $\bm{T}_k^i = \bm{T}_j^i \bm{T}_k^j$
+    \item \textbf{Inverse:} $(\bm{T}_j^i)^{-1} = \bm{T}_i^j = \begin{bmatrix} (\bm{R}_j^i)^T & -(\bm{R}_j^i)^T \bm{p}_j^i \\ \bm{0}^T & 1 \end{bmatrix}$
+    \item \textbf{Identity:} $\bm{T}_i^i = \bm{I}_3$
+    \item \textbf{Determinant:} $\det(\bm{T}_j^i) = 1$
+\end{enumerate}
+
+\textbf{Derivation Methodology: Step-by-Step Approach}
+
+To systematically derive transformation matrices, follow this structured approach:
+
+\textbf{General Derivation Steps:}
+\begin{enumerate}
+    \item \textbf{Frame Assignment}: Clearly define coordinate frames with their origins and orientations
+    \item \textbf{Geometric Analysis}: Identify translation and rotation relationships between frames
+    \item \textbf{Parameter Extraction}: Extract angle $\theta$ and translation components $(x, y)$
+    \item \textbf{Matrix Construction}: Build the transformation matrix using the standard form
+    \item \textbf{Verification}: Check results using geometric reasoning or known points
+\end{enumerate}
+
+\textbf{Use Case Exercise: Mobile Robot Navigation}
+
+\textbf{Problem Statement:}
+A mobile robot starts at the origin of a world frame $\{W\}$. The robot first translates 3 units along the positive $x$-axis, then rotates $45^{\circ}$ counterclockwise, and finally translates 2 units along its new local $x$-axis direction. Find the complete transformation matrix from the world frame to the robot's final frame $\{R\}$.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=1.0]
+    % World frame
+    \draw[thick, ->, red] (0,0) -- (1,0) node[right] {$x_W$};
+    \draw[thick, ->, red] (0,0) -- (0,1) node[above] {$y_W$};
+    \node[below left, red] at (0,0) {$W$};
+    
+    % Step 1: Translation
+    \draw[dashed, blue] (0,0) -- (3,0);
+    \fill[blue] (3,0) circle (2pt);
+    \node[below, blue] at (3,0) {Step 1};
+    \draw[thick, ->, blue] (3,0) -- (3.8,0) node[right] {$x_1$};
+    \draw[thick, ->, blue] (3,0) -- (3,0.8) node[above] {$y_1$};
+    
+    % Step 2: Rotation (45 degrees)
+    \draw[thick] (3.3,0) arc (0:45:0.3);
+    \node at (3.6,0.2) {\small $45^{\circ}$};
+    
+    % Step 3: Final position
+    \draw[thick, green] (3,0) -- (3+2*0.707, 2*0.707);
+    \fill[green] (3+2*0.707, 2*0.707) circle (3pt);
+    \node[above right, green] at (3+2*0.707, 2*0.707) {Final};
+    
+    % Final frame
+    \draw[thick, ->, green] (3+2*0.707, 2*0.707) -- (3+2*0.707+0.707, 2*0.707+0.707) node[right] {$x_R$};
+    \draw[thick, ->, green] (3+2*0.707, 2*0.707) -- (3+2*0.707-0.707, 2*0.707+0.707) node[above] {$y_R$};
+    
+    % Annotations
+    \node[below] at (1.5,0) {\small $3$ units};
+    \node[above left] at (3.7,0.7) {\small $2$ units};
+    
+    % Grid for reference
+    \draw[very thin, gray!30] (0,0) grid (6,3);
+\end{tikzpicture}
+\caption{Mobile robot navigation exercise showing sequential transformations: translation, rotation, and final translation.}
+\label{fig:robot_navigation}
+\end{figure}
+
+\textbf{Step-by-Step Solution:}
+
+\textbf{Step 1: Frame Assignment and Analysis}
+\begin{itemize}
+    \item World frame $\{W\}$: Fixed reference frame at origin
+    \item Intermediate frame $\{I\}$: After first translation (3,0) with same orientation as $\{W\}$
+    \item Final robot frame $\{R\}$: After rotation and second translation
+\end{itemize}
+
+\textbf{Step 2: Break Down the Motion}
+
+\textit{Sub-transformation 1: World to Intermediate ($\bm{T}_I^W$)}
+- Pure translation by 3 units along $x_W$
+- No rotation ($\theta = 0^{\circ}$)
+\begin{align}
+\bm{T}_I^W &= \begin{bmatrix}
+\cos(0^{\circ}) & -\sin(0^{\circ}) & 3 \\
+\sin(0^{\circ}) & \cos(0^{\circ}) & 0 \\
+0 & 0 & 1
+\end{bmatrix} = \begin{bmatrix}
+1 & 0 & 3 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textit{Sub-transformation 2: Intermediate to Robot ($\bm{T}_R^I$)}
+- Rotation by $45^{\circ}$ counterclockwise
+- Translation by 2 units along rotated $x$-axis
+- Combined rotation and translation:
+\begin{align}
+\theta &= 45^{\circ} = \frac{\pi}{4} \text{ rad} \\
+x_{trans} &= 2\cos(45^{\circ}) = 2 \cdot \frac{\sqrt{2}}{2} = \sqrt{2} \\
+y_{trans} &= 2\sin(45^{\circ}) = 2 \cdot \frac{\sqrt{2}}{2} = \sqrt{2}
+\end{align}
+
+\begin{align}
+\bm{T}_R^I &= \begin{bmatrix}
+\cos(45^{\circ}) & -\sin(45^{\circ}) & \sqrt{2} \\
+\sin(45^{\circ}) & \cos(45^{\circ}) & \sqrt{2} \\
+0 & 0 & 1
+\end{bmatrix} = \begin{bmatrix}
+\frac{\sqrt{2}}{2} & -\frac{\sqrt{2}}{2} & \sqrt{2} \\
+\frac{\sqrt{2}}{2} & \frac{\sqrt{2}}{2} & \sqrt{2} \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Step 3: Compose Complete Transformation}
+\begin{align}
+\bm{T}_R^W &= \bm{T}_I^W \bm{T}_R^I \\
+&= \begin{bmatrix}
+1 & 0 & 3 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix} \begin{bmatrix}
+\frac{\sqrt{2}}{2} & -\frac{\sqrt{2}}{2} & \sqrt{2} \\
+\frac{\sqrt{2}}{2} & \frac{\sqrt{2}}{2} & \sqrt{2} \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Step 4: Matrix Multiplication}
+
+\textit{Rotation part (upper-left $2 \times 2$):}
+\begin{align}
+R_{11} &= 1 \cdot \frac{\sqrt{2}}{2} + 0 \cdot \frac{\sqrt{2}}{2} = \frac{\sqrt{2}}{2} \\
+R_{12} &= 1 \cdot (-\frac{\sqrt{2}}{2}) + 0 \cdot \frac{\sqrt{2}}{2} = -\frac{\sqrt{2}}{2} \\
+R_{21} &= 0 \cdot \frac{\sqrt{2}}{2} + 1 \cdot \frac{\sqrt{2}}{2} = \frac{\sqrt{2}}{2} \\
+R_{22} &= 0 \cdot (-\frac{\sqrt{2}}{2}) + 1 \cdot \frac{\sqrt{2}}{2} = \frac{\sqrt{2}}{2}
+\end{align}
+
+\textit{Translation part:}
+\begin{align}
+T_x &= 1 \cdot \sqrt{2} + 0 \cdot \sqrt{2} + 3 \cdot 1 = \sqrt{2} + 3 \\
+T_y &= 0 \cdot \sqrt{2} + 1 \cdot \sqrt{2} + 0 \cdot 1 = \sqrt{2}
+\end{align}
+
+\textbf{Step 5: Final Result}
+\begin{align}
+\bm{T}_R^W &= \begin{bmatrix}
+\frac{\sqrt{2}}{2} & -\frac{\sqrt{2}}{2} & 3 + \sqrt{2} \\
+\frac{\sqrt{2}}{2} & \frac{\sqrt{2}}{2} & \sqrt{2} \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Step 6: Numerical Verification}
+Using $\sqrt{2} \approx 1.414$:
+\begin{align}
+\bm{T}_R^W &\approx \begin{bmatrix}
+0.707 & -0.707 & 4.414 \\
+0.707 & 0.707 & 1.414 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Step 7: Geometric Verification}
+
+The robot's final position should be:
+\begin{align}
+\text{Position} &= (3, 0) + 2(\cos(45^{\circ}), \sin(45^{\circ})) \\
+&= (3, 0) + (1.414, 1.414) \\
+&= (4.414, 1.414)
+\end{align}
+
+This matches our transformation matrix result: $(T_x, T_y) = (4.414, 1.414)$ \checkmark
+
+\textbf{Step 8: Alternative Verification Using Point Transformation}
+
+Transform the origin of frame $\{R\}$ to world coordinates:
+\begin{align}
+\begin{bmatrix} x_W \\ y_W \\ 1 \end{bmatrix} &= \bm{T}_R^W \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} 4.414 \\ 1.414 \\ 1 \end{bmatrix}
+\end{align}
+
+This confirms our final position calculation.
+
+\textbf{Key Learning Points:}
+\begin{enumerate}
+    \item \textbf{Sequential transformations}: Complex motions break down into simpler components
+    \item \textbf{Matrix composition}: Order matters in matrix multiplication
+    \item \textbf{Translation after rotation}: The translation vector must account for the rotated coordinate system
+    \item \textbf{Verification importance}: Always check results using multiple methods
+    \item \textbf{Geometric intuition}: Mathematical results should match physical expectations
+\end{enumerate}
+
+\textbf{Illustrative Example: Simple 2D Pendulum}
+
+To demonstrate transformation matrix concepts, consider a simple 2D pendulum system shown in Figure \ref{fig:pendulum_example}:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=1.5]
+    % Grid for reference (optional, can be removed)
+    %\draw[very thin,color=gray] (-0.5,-2.5) grid (3.5,1.5);
+    
+    % Base frame (origin)
+    \draw[thick, ->, red] (0,0) -- (1,0) node[right] {$x_0$};
+    \draw[thick, ->, red] (0,0) -- (0,1) node[above] {$y_0$};
+    \node[below left, red] at (0,0) {$O \{0\}$};
+    
+    % Vertical reference line (dashed)
+    \draw[dashed, gray] (0,0) -- (0,-2.5) node[below] {Vertical};
+    
+    % Pendulum rod
+    \draw[thick, black] (0,0) -- (2*0.866, -2) node[midway, above right] {$L$};
+    \fill[black] (0,0) circle (2.5pt) node[above left] {Pivot};
+    \fill[blue] (2*0.866, -2) circle (4pt) node[below right] {Mass $m$};
+    
+    % Angle arc and label
+    \draw[thick] (0,-0.7) arc (-90:-60:0.7);
+    \node at (0.4,-0.9) {$\theta$};
+    
+    % Pendulum frame at mass location
+    \draw[thick, ->, blue] (2*0.866, -2) -- (2*0.866+0.8, -2) node[right] {$x_1$};
+    \draw[thick, ->, blue] (2*0.866, -2) -- (2*0.866, -2+0.8) node[above] {$y_1$};
+    \node[below left, blue] at (2*0.866, -2) {$\{1\}$};
+    
+    % Position components
+    \draw[dotted, green!60!black] (0,0) -- (2*0.866, 0) node[midway, above] {$L\sin\theta$};
+    \draw[dotted, green!60!black] (2*0.866, 0) -- (2*0.866, -2) node[midway, right] {$L\cos\theta$};
+    
+    % Coordinate labels with better positioning
+    \node[red, below] at (-1.7,-0.3) {\textbf{Base Frame} $\{0\}$: Fixed at pivot};
+    \node[blue, below] at (2.5,-2.8) {\textbf{Pendulum Frame} $\{1\}$: Attached to mass};
+    
+    % Additional annotations
+    \node[above right] at (1, -1) {\small $\bm{r} = L[\sin\theta, -\cos\theta]^T$};
+\end{tikzpicture}
+\caption{Simple 2D pendulum system demonstrating coordinate frame transformations. The base frame $\{0\}$ is fixed at the pivot point, while the pendulum frame $\{1\}$ moves with the mass. The position vector components and transformation angle $\theta$ are clearly illustrated.}
+\label{fig:pendulum_example}
+\end{figure}
+
+\textbf{System Description:}
+\begin{itemize}
+    \item Base frame $\{0\}$: Fixed coordinate system at the pivot point
+    \item Pendulum frame $\{1\}$: Moving coordinate system attached to the mass
+    \item Length: $L$ (distance from pivot to mass)
+    \item Angle: $\theta$ (measured from vertical, positive clockwise)
+\end{itemize}
+
+\textbf{Transformation Matrix Derivation:}
+
+The transformation from base frame $\{0\}$ to pendulum frame $\{1\}$ is:
+\begin{align}
+\bm{T}_1^0 &= \begin{bmatrix}
+\cos\theta & -\sin\theta & L\sin\theta \\
+\sin\theta & \cos\theta & -L\cos\theta \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Step-by-Step Derivation:}
+
+1) \textbf{Position of pendulum mass in base frame:}
+   \begin{align}
+   x_m &= L\sin\theta \\
+   y_m &= -L\cos\theta
+   \end{align}
+
+2) \textbf{Orientation of pendulum frame:}
+   The pendulum frame is rotated by angle $\theta$ relative to the base frame.
+
+3) \textbf{Complete transformation:}
+   \begin{align}
+   \begin{bmatrix} x_1 \\ y_1 \\ 1 \end{bmatrix} &= \bm{T}_1^0 \begin{bmatrix} x_0 \\ y_0 \\ 1 \end{bmatrix} \\
+   &= \begin{bmatrix}
+   \cos\theta & -\sin\theta & L\sin\theta \\
+   \sin\theta & \cos\theta & -L\cos\theta \\
+   0 & 0 & 1
+   \end{bmatrix} \begin{bmatrix} x_0 \\ y_0 \\ 1 \end{bmatrix}
+   \end{align}
+
+\textbf{Numerical Example:}
+
+For $\theta = 30^{\circ}$ and $L = 1$ meter:
+\begin{align}
+\bm{T}_1^0 &= \begin{bmatrix}
+\cos(30^{\circ}) & -\sin(30^{\circ}) & 1 \cdot \sin(30^{\circ}) \\
+\sin(30^{\circ}) & \cos(30^{\circ}) & -1 \cdot \cos(30^{\circ}) \\
+0 & 0 & 1
+\end{bmatrix} \\
+&= \begin{bmatrix}
+0.866 & -0.5 & 0.5 \\
+0.5 & 0.866 & -0.866 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Verification:}
+The origin of frame $\{1\}$ (pendulum mass position) in frame $\{0\}$:
+\begin{align}
+\begin{bmatrix} x_m \\ y_m \\ 1 \end{bmatrix} &= \bm{T}_1^0 \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix} = \begin{bmatrix} 0.5 \\ -0.866 \\ 1 \end{bmatrix}
+\end{align}
+
+This matches our geometric calculation: $x_m = L\sin(30^{\circ}) = 0.5$, $y_m = -L\cos(30^{\circ}) = -0.866$.
+
+\textbf{Connection to Robot Analysis:}
+
+This pendulum example demonstrates the same principles used in our robot:
+\begin{enumerate}
+    \item \textbf{Frame assignment:} Each moving part gets its own coordinate frame
+    \item \textbf{DH-like parameterization:} Angle $\theta$ and length $L$ define the transformation
+    \item \textbf{Forward kinematics:} Transformation matrix gives end-effector position
+    \item \textbf{Singularity concepts:} When $\theta = 0^{\circ}$ or $180^{\circ}$, the pendulum loses a degree of freedom
+\end{enumerate}
+
+The robot's two-link structure can be viewed as two connected pendulums, making this a perfect stepping stone to understanding the more complex system.
+
+\textbf{Specific Transformations for the Robot:}
+
+\textit{1. Base to Joint 1 Transformation:}
+Since joint 1 is located at the base origin with rotation $q_1$:
+\begin{align}
+\bm{T}_1^0 &= \begin{bmatrix}
+\cos q_1 & -\sin q_1 & 0 \\
+\sin q_1 & \cos q_1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textit{2. Joint 1 to Link 1 End Transformation:}
+Translation along link 1 of length $l_1$:
+\begin{align}
+\bm{T}_{1e}^1 &= \begin{bmatrix}
+1 & 0 & l_1 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textit{3. Link 1 End to Joint 2 Transformation:}
+Rotation by angle $q_2$ at joint 2:
+\begin{align}
+\bm{T}_2^{1e} &= \begin{bmatrix}
+\cos q_2 & -\sin q_2 & 0 \\
+\sin q_2 & \cos q_2 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textit{4. Joint 2 to End-Effector Transformation:}
+Translation along link 2 of length $l_2$:
+\begin{align}
+\bm{T}_M^2 &= \begin{bmatrix}
+1 & 0 & l_2 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Complete Chain Transformation:}
+The transformation from base to end-effector is:
+\begin{align}
+\bm{T}_M^0 &= \bm{T}_1^0 \bm{T}_{1e}^1 \bm{T}_2^{1e} \bm{T}_M^2 \\
+&= \begin{bmatrix}
+\cos q_1 & -\sin q_1 & 0 \\
+\sin q_1 & \cos q_1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+1 & 0 & l_1 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+\cos q_2 & -\sin q_2 & 0 \\
+\sin q_2 & \cos q_2 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+1 & 0 & l_2 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Simplified End-Effector Transformation:}
+After matrix multiplication, the final transformation becomes:
+\begin{align}
+\bm{T}_M^0 &= \begin{bmatrix}
+\cos(q_1 + q_2) & -\sin(q_1 + q_2) & l_1\cos q_1 + l_2\cos(q_1 + q_2) \\
+\sin(q_1 + q_2) & \cos(q_1 + q_2) & l_1\sin q_1 + l_2\sin(q_1 + q_2) \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Cable Anchor Transformations:}
+For cable analysis, we need transformations from the base frame to cable anchor points:
+
+\textit{Left Cable Anchor:}
+\begin{align}
+\bm{T}_{A1}^0 &= \begin{bmatrix}
+1 & 0 & -L \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textit{Right Cable Anchor:}
+\begin{align}
+\bm{T}_{A2}^0 &= \begin{bmatrix}
+1 & 0 & L \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Point Transformation:}
+To transform a point $\bm{p}_i$ from frame $\{i\}$ to frame $\{j\}$:
+\begin{align}
+\bm{p}_j &= \bm{T}_j^i \begin{bmatrix} \bm{p}_i \\ 1 \end{bmatrix} \\
+\begin{bmatrix} x_j \\ y_j \\ 1 \end{bmatrix} &= \begin{bmatrix}
+\cos\theta & -\sin\theta & x_{trans} \\
+\sin\theta & \cos\theta & y_{trans} \\
+0 & 0 & 1
+\end{bmatrix} \begin{bmatrix} x_i \\ y_i \\ 1 \end{bmatrix}
+\end{align}
+
+\textbf{Vector Transformation:}
+To transform a vector $\bm{v}_i$ (direction only):
+\begin{align}
+\bm{v}_j &= \bm{R}_j^i \bm{v}_i \\
+\begin{bmatrix} v_{x,j} \\ v_{y,j} \end{bmatrix} &= \begin{bmatrix}
+\cos\theta & -\sin\theta \\
+\sin\theta & \cos\theta
+\end{bmatrix} \begin{bmatrix} v_{x,i} \\ v_{y,i} \end{bmatrix}
+\end{align}
+
+\textbf{Applications in Singularity Analysis:}
+Transformation matrices are crucial for:
+\begin{enumerate}
+    \item \textbf{Jacobian Computation:} Relating joint velocities to end-effector velocities
+    \item \textbf{Cable Vector Calculation:} Determining cable directions in different frames
+    \item \textbf{Force Transformation:} Converting forces between coordinate frames
+    \item \textbf{Workspace Analysis:} Mapping reachable positions and orientations
+\end{enumerate}
+
+\subsubsection{Denavit-Hartenberg Parameters}
+The Denavit-Hartenberg (DH) convention provides a systematic method for describing the kinematic structure of serial manipulators. For the 2-DOF planar serial chain, we establish the DH parameters that define the relationship between consecutive coordinate frames.
+
+\textbf{DH Convention Rules:}
+The DH convention defines four parameters for each link:
+\begin{itemize}
+    \item $a_i$: Link length - distance from $z_{i-1}$ to $z_i$ along $x_i$
+    \item $\alpha_i$: Link twist - angle from $z_{i-1}$ to $z_i$ about $x_i$
+    \item $d_i$: Link offset - distance from $x_{i-1}$ to $x_i$ along $z_{i-1}$
+    \item $\theta_i$: Joint angle - angle from $x_{i-1}$ to $x_i$ about $z_{i-1}$
+\end{itemize}
+
+\textbf{Frame Assignment for 2-DOF Planar Robot:}
+
+\textit{Frame 0 (Base Frame):}
+\begin{itemize}
+    \item Origin at joint 1 center
+    \item $z_0$-axis: perpendicular to the plane (pointing out of page)
+    \item $x_0$-axis: along the initial direction of link 1
+    \item $y_0$-axis: completes the right-hand coordinate system
+\end{itemize}
+
+\textit{Frame 1 (After Joint 1):}
+\begin{itemize}
+    \item Origin at joint 2 center (end of link 1)
+    \item $z_1$-axis: parallel to $z_0$ (planar motion)
+    \item $x_1$-axis: along the direction of link 2
+    \item $y_1$-axis: completes the right-hand coordinate system
+\end{itemize}
+
+\textit{Frame 2 (End-Effector Frame):}
+\begin{itemize}
+    \item Origin at end-effector point M
+    \item $z_2$-axis: parallel to $z_0$ and $z_1$
+    \item $x_2$-axis: along the final link direction
+    \item $y_2$-axis: completes the right-hand coordinate system
+\end{itemize}
+
+\textbf{DH Parameters for the 2-DOF Planar Robot:}
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Link & $a_i$ & $\alpha_i$ & $d_i$ & $\theta_i$ & Description \\
+\hline
+1 & $l_1$ & $0$ & $0$ & $q_1^*$ & First revolute joint \\
+2 & $l_2$ & $0$ & $0$ & $q_2^*$ & Second revolute joint \\
+\hline
+\end{tabular}
+\caption{Denavit-Hartenberg parameters for 2-DOF planar serial chain}
+\label{tab:dh_parameters}
+\end{table}
+
+Where $q_i^*$ indicates that $\theta_i = q_i$ (joint variable).
+
+\textbf{Detailed Parameter Justification:}
+
+\textit{Link 1 Parameters:}
+\begin{align}
+a_1 &= l_1 \quad \text{(length of link 1)} \\
+\alpha_{DH,1} &= 0 \quad \text{(planar motion, no twist)} \\
+d_1 &= 0 \quad \text{(revolute joint, no offset)} \\
+\theta_1 &= q_1 \quad \text{(joint variable)}
+\end{align}
+
+\textit{Link 2 Parameters:}
+\begin{align}
+a_2 &= l_2 \quad \text{(length of link 2)} \\
+\alpha_{DH,2} &= 0 \quad \text{(planar motion, no twist)} \\
+d_2 &= 0 \quad \text{(revolute joint, no offset)} \\
+\theta_2 &= q_2 \quad \text{(joint variable)}
+\end{align}
+
+\textbf{DH Transformation Matrix:}
+The standard DH transformation matrix from frame $i-1$ to frame $i$ is:
+\begin{align}
+\bm{T}_i^{i-1} &= \text{Rot}_{z}(\theta_i) \cdot \text{Trans}_{z}(d_i) \cdot \text{Trans}_{x}(a_i) \cdot \text{Rot}_{x}(\alpha_i) \\
+&= \begin{bmatrix}
+\cos\theta_i & -\sin\theta_i\cos\alpha_i & \sin\theta_i\sin\alpha_i & a_i\cos\theta_i \\
+\sin\theta_i & \cos\theta_i\cos\alpha_i & -\cos\theta_i\sin\alpha_i & a_i\sin\theta_i \\
+0 & \sin\alpha_i & \cos\alpha_i & d_i \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Simplified 2D Planar Case:}
+For planar motion ($\alpha_i = 0$, $d_i = 0$), the transformation simplifies to:
+\begin{align}
+\bm{T}_i^{i-1} &= \begin{bmatrix}
+\cos\theta_i & -\sin\theta_i & a_i\cos\theta_i \\
+\sin\theta_i & \cos\theta_i & a_i\sin\theta_i \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Individual Link Transformations:}
+
+\textit{Base to Frame 1 (Joint 1):}
+\begin{align}
+\bm{T}_1^0 &= \begin{bmatrix}
+\cos q_1 & -\sin q_1 & l_1\cos q_1 \\
+\sin q_1 & \cos q_1 & l_1\sin q_1 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textit{Frame 1 to Frame 2 (Joint 2):}
+\begin{align}
+\bm{T}_2^1 &= \begin{bmatrix}
+\cos q_2 & -\sin q_2 & l_2\cos q_2 \\
+\sin q_2 & \cos q_2 & l_2\sin q_2 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Forward Kinematics via DH Parameters:}
+The complete transformation from base to end-effector:
+\begin{align}
+\bm{T}_2^0 &= \bm{T}_1^0 \bm{T}_2^1 \\
+&= \begin{bmatrix}
+\cos q_1 & -\sin q_1 & l_1\cos q_1 \\
+\sin q_1 & \cos q_1 & l_1\sin q_1 \\
+0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+\cos q_2 & -\sin q_2 & l_2\cos q_2 \\
+\sin q_2 & \cos q_2 & l_2\sin q_2 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+After multiplication:
+\begin{align}
+\bm{T}_2^0 &= \begin{bmatrix}
+\cos(q_1+q_2) & -\sin(q_1+q_2) & l_1\cos q_1 + l_2\cos(q_1+q_2) \\
+\sin(q_1+q_2) & \cos(q_1+q_2) & l_1\sin q_1 + l_2\sin(q_1+q_2) \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{End-Effector Position:}
+From the transformation matrix, the end-effector position is:
+\begin{align}
+\bm{p}_M &= \begin{bmatrix} x_M \\ y_M \end{bmatrix} = \begin{bmatrix}
+l_1\cos q_1 + l_2\cos(q_1+q_2) \\
+l_1\sin q_1 + l_2\sin(q_1+q_2)
+\end{bmatrix}
+\end{align}
+
+\textbf{Validation of DH Parameters:}
+The DH parameters can be validated by checking:
+\begin{enumerate}
+    \item \textbf{Workspace boundary:} Maximum reach = $l_1 + l_2$, minimum reach = $|l_1 - l_2|$
+    \item \textbf{Joint limits:} Typical range $q_i \in [-\pi, \pi]$ for full rotation
+    \item \textbf{Singularity conditions:} When $q_2 = 0$ or $q_2 = \pi$ (extended/folded)
+    \item \textbf{Frame consistency:} Right-hand rule preserved through all transformations
+\end{enumerate}
+
+\textbf{Alternative DH Conventions:}
+Note that some literature uses modified DH parameters. The relationship between standard and modified DH is:
+\begin{align}
+\bm{T}_{i,modified}^{i-1} &= \text{Rot}_{x}(\alpha_{i-1}) \cdot \text{Trans}_{x}(a_{i-1}) \cdot \text{Rot}_{z}(\theta_i) \cdot \text{Trans}_{z}(d_i)
+\end{align}
+
+For our planar robot, both conventions yield the same result due to $\alpha_i = 0$ and $d_i = 0$.
+
+\textbf{Applications in Singularity Analysis:}
+DH parameters are fundamental for:
+\begin{enumerate}
+    \item \textbf{Jacobian derivation:} Systematic computation of velocity relationships
+    \item \textbf{Workspace analysis:} Determining reachable positions and orientations
+    \item \textbf{Inverse kinematics:} Solving for joint angles given end-effector pose
+    \item \textbf{Dynamic modeling:} Computing inertia matrices and Coriolis terms
+\end{enumerate}
+
+\section{Forward Kinematics}
+
+\subsection{Serial Chain Kinematics}
+For the 2-DOF serial chain, the forward kinematics are:
+
+\subsubsection{Joint 2 Position (Elbow)}
+\begin{align}
+\bm{p}_A &= \begin{bmatrix} x_A \\ y_A \end{bmatrix} = \begin{bmatrix} l_1 \cos q_1 \\ l_1 \sin q_1 \end{bmatrix}
+\end{align}
+
+\subsubsection{End-Effector Position}
+\begin{align}
+\bm{p}_M &= \begin{bmatrix} x_M \\ y_M \end{bmatrix} \\
+&= \bm{p}_A + l_2 \begin{bmatrix} \cos(q_1 + q_2) \\ \sin(q_1 + q_2) \end{bmatrix} \\
+&= \begin{bmatrix} l_1 \cos q_1 + l_2 \cos(q_1 + q_2) \\ l_1 \sin q_1 + l_2 \sin(q_1 + q_2) \end{bmatrix}
+\end{align}
+
+\subsubsection{Transformation Matrices}
+
+\textbf{Derivation of Transformation Matrices:}
+
+The transformation matrices are derived systematically using the Denavit-Hartenberg parameters established in the previous section. We'll show the step-by-step derivation for each transformation.
+
+\textbf{Step 1: Base to Frame 1 Transformation ($\bm{T}_1^0$)}
+
+Starting from the DH parameters for link 1:
+- $a_1 = l_1$, $\alpha_{DH,1} = 0$, $d_1 = 0$, $\theta_1 = q_1$
+
+The general DH transformation matrix is:
+\begin{align}
+\bm{T}_i^{i-1} &= \begin{bmatrix}
+\cos\theta_i & -\sin\theta_i\cos\alpha_i & \sin\theta_i\sin\alpha_i & a_i\cos\theta_i \\
+\sin\theta_i & \cos\theta_i\cos\alpha_i & -\cos\theta_i\sin\alpha_i & a_i\sin\theta_i \\
+0 & \sin\alpha_i & \cos\alpha_i & d_i \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+Substituting the parameters for link 1 ($\theta_1 = q_1$, $\alpha_1 = 0$, $d_1 = 0$, $a_1 = l_1$):
+\begin{align}
+\cos\alpha_{DH,1} &= \cos(0) = 1 \\
+\sin\alpha_{DH,1} &= \sin(0) = 0
+\end{align}
+
+Therefore:
+\begin{align}
+\bm{T}_1^0 &= \begin{bmatrix}
+\cos q_1 & -\sin q_1 \cdot 1 & \sin q_1 \cdot 0 & l_1\cos q_1 \\
+\sin q_1 & \cos q_1 \cdot 1 & -\cos q_1 \cdot 0 & l_1\sin q_1 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix} \\
+&= \begin{bmatrix}
+\cos q_1 & -\sin q_1 & 0 & l_1\cos q_1 \\
+\sin q_1 & \cos q_1 & 0 & l_1\sin q_1 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+For 2D planar motion, we reduce this to:
+\begin{align}
+\bm{T}_1^0 &= \begin{bmatrix}
+\cos q_1 & -\sin q_1 & l_1\cos q_1 \\
+\sin q_1 & \cos q_1 & l_1\sin q_1 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Physical Interpretation:}
+This transformation represents:
+\begin{itemize}
+    \item \textbf{Rotation by $q_1$}: The $2 \times 2$ rotation submatrix rotates frame 0 by angle $q_1$
+    \item \textbf{Translation by $l_1$}: The translation vector moves along the rotated $x_1$-axis by distance $l_1$
+\end{itemize}
+
+\textbf{Step 2: Frame 1 to Frame 2 Transformation ($\bm{T}_2^1$)}
+
+For link 2 with DH parameters:
+- $a_2 = l_2$, $\alpha_{DH,2} = 0$, $d_2 = 0$, $\theta_2 = q_2$
+
+Following the same process:
+\begin{align}
+\bm{T}_2^1 &= \begin{bmatrix}
+\cos q_2 & -\sin q_2 & l_2\cos q_2 \\
+\sin q_2 & \cos q_2 & l_2\sin q_2 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Step 3: Complete Chain Transformation ($\bm{T}_2^0$)}
+
+The complete transformation from base to end-effector is obtained by matrix multiplication:
+\begin{align}
+\bm{T}_2^0 &= \bm{T}_1^0 \bm{T}_2^1 \\
+&= \begin{bmatrix}
+\cos q_1 & -\sin q_1 & l_1\cos q_1 \\
+\sin q_1 & \cos q_1 & l_1\sin q_1 \\
+0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+\cos q_2 & -\sin q_2 & l_2\cos q_2 \\
+\sin q_2 & \cos q_2 & l_2\sin q_2 \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Detailed Matrix Multiplication:}
+
+Let's compute each element of the result matrix $\bm{T}_2^0$:
+
+\textit{Rotation Matrix Elements (upper-left $2 \times 2$):}
+\begin{align}
+R_{11} &= \cos q_1 \cos q_2 - (-\sin q_1)(\sin q_2) = \cos q_1 \cos q_2 + \sin q_1 \sin q_2 = \cos(q_1 + q_2) \\
+R_{12} &= \cos q_1(-\sin q_2) - (-\sin q_1)(\cos q_2) = -\cos q_1 \sin q_2 + \sin q_1 \cos q_2 = -\sin(q_1 + q_2) \\
+R_{21} &= \sin q_1 \cos q_2 - \cos q_1 \sin q_2 = \sin q_1 \cos q_2 - \cos q_1 \sin q_2 = \sin(q_1 + q_2) \\
+R_{22} &= \sin q_1(-\sin q_2) - \cos q_1(-\cos q_2) = -\sin q_1 \sin q_2 + \cos q_1 \cos q_2 = \cos(q_1 + q_2)
+\end{align}
+
+\textit{Translation Vector Elements:}
+\begin{align}
+T_x &= \cos q_1 (l_2\cos q_2) + (-\sin q_1)(l_2\sin q_2) + l_1\cos q_1 \\
+&= l_2(\cos q_1 \cos q_2 - \sin q_1 \sin q_2) + l_1\cos q_1 \\
+&= l_2\cos(q_1 + q_2) + l_1\cos q_1 \\
+T_y &= \sin q_1 (l_2\cos q_2) + \cos q_1 (l_2\sin q_2) + l_1\sin q_1 \\
+&= l_2(\sin q_1 \cos q_2 + \cos q_1 \sin q_2) + l_1\sin q_1 \\
+&= l_2\sin(q_1 + q_2) + l_1\sin q_1
+\end{align}
+
+\textbf{Final Result:}
+\begin{align}
+\bm{T}_2^0 &= \begin{bmatrix}
+\cos(q_1 + q_2) & -\sin(q_1 + q_2) & l_1\cos q_1 + l_2\cos(q_1 + q_2) \\
+\sin(q_1 + q_2) & \cos(q_1 + q_2) & l_1\sin q_1 + l_2\sin(q_1 + q_2) \\
+0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\textbf{Verification Using Trigonometric Identities:}
+
+The derivation uses the angle addition formulas:
+\begin{align}
+\cos(A + B) &= \cos A \cos B - \sin A \sin B \\
+\sin(A + B) &= \sin A \cos B + \cos A \sin B
+\end{align}
+
+Where $A = q_1$ and $B = q_2$.
+
+\textbf{Alternative Derivation - Geometric Approach:}
+
+We can also derive this geometrically:
+\begin{enumerate}
+    \item \textbf{Joint 1 contribution:} Point moves from origin to $(l_1\cos q_1, l_1\sin q_1)$
+    \item \textbf{Joint 2 contribution:} From joint 1 position, move distance $l_2$ in direction $(q_1 + q_2)$
+    \item \textbf{Final position:} Sum of both contributions gives the end-effector position
+\end{enumerate}
+
+\textbf{Summary of Individual Transformations:}
+\begin{align}
+\bm{T}_1^0 &= \begin{bmatrix}
+\cos q_1 & -\sin q_1 & l_1 \cos q_1 \\
+\sin q_1 & \cos q_1 & l_1 \sin q_1 \\
+0 & 0 & 1
+\end{bmatrix} \quad \text{(Base to Joint 2)} \\
+\bm{T}_2^1 &= \begin{bmatrix}
+\cos q_2 & -\sin q_2 & l_2 \cos q_2 \\
+\sin q_2 & \cos q_2 & l_2 \sin q_2 \\
+0 & 0 & 1
+\end{bmatrix} \quad \text{(Joint 2 to End-Effector)} \\
+\bm{T}_2^0 &= \bm{T}_1^0 \bm{T}_2^1 \quad \text{(Complete Chain)}
+\end{align}
+
+\subsection{Cable Kinematics}
+Both cables are attached to the end-effector point M and extend to fixed anchor points:
+
+\subsubsection{Cable Length Equations}
+Cable 1 connects anchor point $A_1 = (-L, 0)$ to end-effector M:
+\begin{align}
+\rho_1 &= \|\bm{p}_M - \bm{A}_1\| \\
+&= \sqrt{(x_M + L)^2 + y_M^2} \\
+&= \sqrt{(l_1 \cos q_1 + l_2 \cos(q_1 + q_2) + L)^2 + (l_1 \sin q_1 + l_2 \sin(q_1 + q_2))^2}
+\end{align}
+
+Cable 2 connects anchor point $A_2 = (L, 0)$ to end-effector M:
+\begin{align}
+\rho_2 &= \|\bm{p}_M - \bm{A}_2\| \\
+&= \sqrt{(x_M - L)^2 + y_M^2} \\
+&= \sqrt{(l_1 \cos q_1 + l_2 \cos(q_1 + q_2) - L)^2 + (l_1 \sin q_1 + l_2 \sin(q_1 + q_2))^2}
+\end{align}
+
+\subsubsection{Cable Direction Vectors}
+The unit vectors along the cables (from anchor points toward end-effector) are:
+\begin{align}
+\bm{u}_1 &= \frac{\bm{p}_M - \bm{A}_1}{\rho_1} = \frac{1}{\rho_1}\begin{bmatrix} x_M + L \\ y_M \end{bmatrix} \\
+\bm{u}_2 &= \frac{\bm{p}_M - \bm{A}_2}{\rho_2} = \frac{1}{\rho_2}\begin{bmatrix} x_M - L \\ y_M \end{bmatrix}
+\end{align}
+
+Alternatively, using the cable angles:
+\begin{align}
+\bm{u}_1 &= \begin{bmatrix} \cos\alpha_1 \\ \sin\alpha_1 \end{bmatrix} = \begin{bmatrix} \cos(\text{atan2}(y_M, x_M + L)) \\ \sin(\text{atan2}(y_M, x_M + L)) \end{bmatrix} \\
+\bm{u}_2 &= \begin{bmatrix} \cos\alpha_2 \\ \sin\alpha_2 \end{bmatrix} = \begin{bmatrix} \cos(\text{atan2}(y_M, x_M - L)) \\ \sin(\text{atan2}(y_M, x_M - L)) \end{bmatrix}
+\end{align}
+
+Note that:
+\begin{align}
+\cos(\text{atan2}(y, x)) &= \frac{x}{\sqrt{x^2 + y^2}} \\
+\sin(\text{atan2}(y, x)) &= \frac{y}{\sqrt{x^2 + y^2}}
+\end{align}
+
+\subsubsection{Cable Angles}
+Using the two-argument arctangent function for proper quadrant handling:
+\begin{align}
+\alpha_1 &= \text{atan2}(y_M, x_M + L) \\
+\alpha_2 &= \text{atan2}(y_M, x_M - L)
+\end{align}
+
+\textbf{Critical for this robot configuration:}
+\begin{itemize}
+    \item When $x_M = -L$: Cable 1 is vertical, $\text{atan2}(y_M, 0)$ handles this correctly
+    \item When $x_M = +L$: Cable 2 is vertical, $\text{atan2}(y_M, 0)$ handles this correctly  
+    \item When $y_M = 0$: Both cables horizontal, $\text{atan2}(0, x_M \pm L)$ returns $0$ or $\pi$
+    \item Workspace boundaries: Continuous angle computation throughout reachable space
+\end{itemize}
+
+Where $\text{atan2}(y, x)$ returns the angle $\theta \in (-\pi, \pi]$ such that:
+\begin{align}
+x &= r\cos\theta \\
+y &= r\sin\theta
+\end{align}
+
+This formulation:
+\begin{itemize}
+    \item Handles all four quadrants correctly
+    \item Avoids division by zero when $x_M = -L$ or $x_M = L$
+    \item Provides continuous angle values as the end-effector moves
+    \item Returns angles in the range $(-\pi, \pi]$
+\end{itemize}
+
+\subsection{Complete Forward Kinematics}
+In this hybrid system, the end-effector position is determined by both the serial chain configuration and cable length constraints:
+
+\subsubsection{Primary Positioning (Serial Chain)}
+The serial chain provides the primary positioning capability:
+\begin{align}
+\bm{p}_{M,serial} &= \begin{bmatrix} x_M \\ y_M \end{bmatrix} \\
+&= \begin{bmatrix} l_1 \cos q_1 + l_2 \cos(q_1 + q_2) \\ l_1 \sin q_1 + l_2 \sin(q_1 + q_2) \end{bmatrix}
+\end{align}
+
+\subsubsection{Cable Length Constraints}
+The cables impose constraints on the achievable positions:
+\begin{align}
+\rho_1 &= f_1(\bm{q}) = \sqrt{(x_M(\bm{q}) + L)^2 + y_M(\bm{q})^2} \\
+\rho_2 &= f_2(\bm{q}) = \sqrt{(x_M(\bm{q}) - L)^2 + y_M(\bm{q})^2}
+\end{align}
+
+\subsubsection{Hybrid System Formulation}
+For a given cable length pair $(\rho_1, \rho_2)$, the end-effector must satisfy:
+\begin{align}
+\bm{g}(\bm{q}, \bm{\rho}) &= \begin{bmatrix} g_1(\bm{q}, \rho_1) \\ g_2(\bm{q}, \rho_2) \end{bmatrix} = \bm{0}
+\end{align}
+
+Where:
+\begin{align}
+g_1(\bm{q}, \rho_1) &= (x_M + L)^2 + y_M^2 - \rho_1^2 = 0 \\
+g_2(\bm{q}, \rho_2) &= (x_M - L)^2 + y_M^2 - \rho_2^2 = 0
+\end{align}
+
+\subsubsection{Constraint Equations}
+
+\textbf{Important Clarification: Nature of Cable Constraints}
+
+In a cable-driven robot, the cable lengths $\rho_1$ and $\rho_2$ are indeed \textbf{variable} - they change as the robot moves and are controlled by motors. However, the "constraints" here refer to the \textbf{geometric relationships} that must always be satisfied, not fixed length constraints.
+
+\textbf{Types of Constraints in Hybrid Serial-Cable Systems:}
+
+\textbf{1. Geometric Constraints (Always Satisfied):}
+These are the fundamental geometric relationships that define how cable lengths relate to robot configuration:
+\begin{align}
+\rho_1^2 &= (x_M + L)^2 + y_M^2 \quad \text{(Left cable geometric constraint)} \\
+\rho_2^2 &= (x_M - L)^2 + y_M^2 \quad \text{(Right cable geometric constraint)}
+\end{align}
+
+Where:
+- $\rho_1, \rho_2$: \textbf{Variable} cable lengths (controlled inputs)
+- $x_M, y_M$: End-effector position (functions of joint angles $q_1, q_2$)
+- $L$: Fixed distance between cable anchor points
+
+\textbf{2. Kinematic Constraint (Forward Kinematics):}
+The end-effector position is determined by the serial joint configuration:
+\begin{align}
+x_M &= l_1\cos q_1 + l_2\cos(q_1 + q_2) \\
+y_M &= l_1\sin q_1 + l_2\sin(q_1 + q_2)
+\end{align}
+
+\textbf{3. Cable Length Relationships:}
+Substituting the kinematic equations into the geometric constraints:
+\begin{align}
+\rho_1^2 &= [l_1\cos q_1 + l_2\cos(q_1 + q_2) + L]^2 + [l_1\sin q_1 + l_2\sin(q_1 + q_2)]^2 \\
+\rho_2^2 &= [l_1\cos q_1 + l_2\cos(q_1 + q_2) - L]^2 + [l_1\sin q_1 + l_2\sin(q_1 + q_2)]^2
+\end{align}
+
+\textbf{Different Control Scenarios:}
+
+\textbf{Scenario A: Joint-Space Control (Serial Joints as Inputs)}
+- \textbf{Inputs}: Joint angles $q_1, q_2$
+- \textbf{Determined}: End-effector position $(x_M, y_M)$ via forward kinematics
+- \textbf{Calculated}: Required cable lengths $\rho_1, \rho_2$ via geometric constraints
+- \textbf{Constraint form}: $\rho_i = f(\bm{q})$ (cable lengths as functions of joint angles)
+
+\textbf{Scenario B: Cable-Space Control (Cable Lengths as Inputs)}
+- \textbf{Inputs}: Desired cable lengths $\rho_1, \rho_2$
+- \textbf{Constraint}: The two cable length equations must be satisfied simultaneously
+- \textbf{Determined}: End-effector position $(x_M, y_M)$ via constraint intersection
+- \textbf{Calculated}: Required joint angles $q_1, q_2$ via inverse kinematics
+
+\textbf{Mathematical Formulation for Cable-Space Control:}
+
+The constraint equations become:
+\begin{align}
+g_1(\bm{q}, \rho_1) &= (x_M(\bm{q}) + L)^2 + y_M(\bm{q})^2 - \rho_1^2 = 0 \\
+g_2(\bm{q}, \rho_2) &= (x_M(\bm{q}) - L)^2 + y_M(\bm{q})^2 - \rho_2^2 = 0
+\end{align}
+
+Where $x_M(\bm{q})$ and $y_M(\bm{q})$ are the forward kinematic functions.
+
+\textbf{Constraint Jacobian for Cable-Space Control:}
+\begin{align}
+\bm{G}_q &= \frac{\partial \bm{g}}{\partial \bm{q}} = \begin{bmatrix}
+\frac{\partial g_1}{\partial q_1} & \frac{\partial g_1}{\partial q_2} \\
+\frac{\partial g_2}{\partial q_1} & \frac{\partial g_2}{\partial q_2}
+\end{bmatrix}
+\end{align}
+
+\textbf{Physical Interpretation:}
+
+\begin{itemize}
+    \item \textbf{NOT fixed constraints}: The cables can change length freely
+    \item \textbf{Geometric relationships}: Given any robot configuration, the cable lengths are geometrically determined
+    \item \textbf{Control redundancy}: We can control either joints OR cable lengths, but not both independently
+    \item \textbf{Constraint satisfaction}: Any feasible motion must satisfy the geometric relationships
+\end{itemize}
+
+\textbf{Example - Cable Length Calculation:}
+
+For joint configuration $q_1 = 30^{\circ}$, $q_2 = 45^{\circ}$ with $l_1 = l_2 = 1$ m, $L = 2$ m:
+
+\textit{Step 1: Calculate end-effector position}
+\begin{align}
+x_M &= 1 \cdot \cos(30^{\circ}) + 1 \cdot \cos(75^{\circ}) = 0.866 + 0.259 = 1.125 \text{ m} \\
+y_M &= 1 \cdot \sin(30^{\circ}) + 1 \cdot \sin(75^{\circ}) = 0.500 + 0.966 = 1.466 \text{ m}
+\end{align}
+
+\textit{Step 2: Calculate required cable lengths}
+\begin{align}
+\rho_1 &= \sqrt{(1.125 + 2)^2 + (1.466)^2} = \sqrt{9.766 + 2.151} = 3.452 \text{ m} \\
+\rho_2 &= \sqrt{(1.125 - 2)^2 + (1.466)^2} = \sqrt{0.766 + 2.151} = 1.708 \text{ m}
+\end{align}
+
+\textbf{Key Distinction:}
+- The constraint equations don't fix the cable lengths
+- They define the \textbf{required} cable lengths for any given robot configuration
+- Or conversely, they define the \textbf{achievable} robot configurations for given cable lengths
+
+\section{Jacobian Matrices}
+
+\subsection{Velocity Kinematics}
+
+\textbf{Notation Clarification:}
+To avoid confusion, we establish clear notation for different types of lengths:
+\begin{align}
+l_1, l_2 &: \text{Fixed link lengths of the serial arm} \\
+\rho_1, \rho_2 &: \text{Variable cable lengths (controlled inputs)} \\
+\bm{\rho} &= \begin{bmatrix} \rho_1 \\ \rho_2 \end{bmatrix} \text{ (cable length vector)}
+\end{align}
+
+\textbf{Hybrid System Velocity Kinematics:}
+The relationship between joint velocities, cable length rates, and end-effector velocities:
+\begin{align}
+\dot{\bm{x}} &= \bm{J}(\bm{q}, \bm{\rho}) \begin{bmatrix} \dot{\bm{q}} \\ \dot{\bm{\rho}} \end{bmatrix} \\
+&= \begin{bmatrix} \bm{J}_q & \bm{J}_{\rho} \end{bmatrix} \begin{bmatrix} \dot{\bm{q}} \\ \dot{\bm{\rho}} \end{bmatrix}
+\end{align}
+
+Where:
+\begin{itemize}
+    \item $\dot{\bm{x}} = [\dot{x}_M, \dot{y}_M]^T$: End-effector velocity
+    \item $\dot{\bm{q}} = [\dot{q}_1, \dot{q}_2]^T$: Joint angular velocities
+    \item $\dot{\bm{\rho}} = [\dot{\rho}_1, \dot{\rho}_2]^T$: Cable length change rates
+    \item $\bm{J}_q$: Serial joint Jacobian matrix
+    \item $\bm{J}_{\rho}$: Cable Jacobian matrix
+\end{itemize}
+
+\textbf{Important Note on Cable Jacobian:}
+In our hybrid system, both cables attach to the same end-effector point M. This means:
+\begin{itemize}
+    \item The cables don't directly control end-effector motion independently
+    \item Cable motions are \textbf{constrained} by the serial arm configuration
+    \item The effective Jacobian depends on which actuators are active (joints vs. cables)
+\end{itemize}
+
+\subsection{Serial Joint Jacobian}
+The Jacobian with respect to serial joints:
+\begin{align}
+\bm{J}_q &= \frac{\partial \bm{f}}{\partial \bm{q}} \\
+&= \begin{bmatrix}
+\frac{\partial x}{\partial q_1} & \frac{\partial x}{\partial q_2} & \cdots & \frac{\partial x}{\partial q_{n_j}} \\
+\frac{\partial y}{\partial q_1} & \frac{\partial y}{\partial q_2} & \cdots & \frac{\partial y}{\partial q_{n_j}} \\
+\frac{\partial \theta}{\partial q_1} & \frac{\partial \theta}{\partial q_2} & \cdots & \frac{\partial \theta}{\partial q_{n_j}}
+\end{bmatrix}
+\end{align}
+
+Individual elements for the 2-DOF serial chain:
+\begin{align}
+\frac{\partial x_M}{\partial q_1} &= -l_1 \sin q_1 - l_2 \sin(q_1 + q_2) \\
+\frac{\partial x_M}{\partial q_2} &= -l_2 \sin(q_1 + q_2) \\
+\frac{\partial y_M}{\partial q_1} &= l_1 \cos q_1 + l_2 \cos(q_1 + q_2) \\
+\frac{\partial y_M}{\partial q_2} &= l_2 \cos(q_1 + q_2)
+\end{align}
+
+Therefore, the serial joint Jacobian is:
+\begin{align}
+\bm{J}_q &= \begin{bmatrix}
+-l_1 \sin q_1 - l_2 \sin(q_1 + q_2) & -l_2 \sin(q_1 + q_2) \\
+l_1 \cos q_1 + l_2 \cos(q_1 + q_2) & l_2 \cos(q_1 + q_2)
+\end{bmatrix}
+\end{align}
+
+\subsection{Cable-Constraint Jacobian}
+Since both cables attach to the same point M, we analyze the constraint Jacobian rather than a direct cable Jacobian. 
+
+\subsubsection{Constraint Jacobian with respect to Joint Variables}
+\begin{align}
+\bm{G}_q &= \frac{\partial \bm{g}}{\partial \bm{q}} = \begin{bmatrix}
+\frac{\partial g_1}{\partial q_1} & \frac{\partial g_1}{\partial q_2} \\
+\frac{\partial g_2}{\partial q_1} & \frac{\partial g_2}{\partial q_2}
+\end{bmatrix}
+\end{align}
+
+Computing the partial derivatives:
+\begin{align}
+\frac{\partial g_1}{\partial q_1} &= 2(x_M + L)\frac{\partial x_M}{\partial q_1} + 2y_M\frac{\partial y_M}{\partial q_1} \\
+&= 2(x_M + L)(-l_1 \sin q_1 - l_2 \sin(q_1 + q_2)) + 2y_M(l_1 \cos q_1 + l_2 \cos(q_1 + q_2)) \\
+\frac{\partial g_1}{\partial q_2} &= 2(x_M + L)(-l_2 \sin(q_1 + q_2)) + 2y_M(l_2 \cos(q_1 + q_2)) \\
+\frac{\partial g_2}{\partial q_1} &= 2(x_M - L)(-l_1 \sin q_1 - l_2 \sin(q_1 + q_2)) + 2y_M(l_1 \cos q_1 + l_2 \cos(q_1 + q_2)) \\
+\frac{\partial g_2}{\partial q_2} &= 2(x_M - L)(-l_2 \sin(q_1 + q_2)) + 2y_M(l_2 \cos(q_1 + q_2))
+\end{align}
+
+\subsubsection{Constraint Jacobian with respect to Cable Lengths}
+\begin{align}
+\bm{G}_\rho &= \frac{\partial \bm{g}}{\partial \bm{\rho}} = \begin{bmatrix}
+-2\rho_1 & 0 \\
+0 & -2\rho_2
+\end{bmatrix}
+\end{align}
+
+For this robot, the end-effector position is determined by the serial chain configuration, not directly by cable lengths. However, if we consider the cables as additional constraints, we need to analyze the constraint Jacobian.
+
+The constraint equations are:
+\begin{align}
+g_1(\bm{q}, \rho_1) &= \rho_1^2 - [(x_M + L)^2 + y_M^2] = 0 \\
+g_2(\bm{q}, \rho_2) &= \rho_2^2 - [(x_M - L)^2 + y_M^2] = 0
+\end{align}
+
+The constraint Jacobian with respect to joint variables:
+\begin{align}
+\bm{G}_q &= \begin{bmatrix}
+\frac{\partial g_1}{\partial q_1} & \frac{\partial g_1}{\partial q_2} \\
+\frac{\partial g_2}{\partial q_1} & \frac{\partial g_2}{\partial q_2}
+\end{bmatrix} \\
+&= -2\begin{bmatrix}
+(x_M + L)\frac{\partial x_M}{\partial q_1} + y_M\frac{\partial y_M}{\partial q_1} & (x_M + L)\frac{\partial x_M}{\partial q_2} + y_M\frac{\partial y_M}{\partial q_2} \\
+(x_M - L)\frac{\partial x_M}{\partial q_1} + y_M\frac{\partial y_M}{\partial q_1} & (x_M - L)\frac{\partial x_M}{\partial q_2} + y_M\frac{\partial y_M}{\partial q_2}
+\end{bmatrix}
+\end{align}
+
+The constraint Jacobian with respect to cable lengths:
+\begin{align}
+\bm{G}_\rho &= \begin{bmatrix}
+2\rho_1 & 0 \\
+0 & 2\rho_2
+\end{bmatrix}
+\end{align}
+
+\section{Constraint Analysis}
+
+\subsection{Constraint Jacobian}
+The constraint Jacobian relates constraint variations to joint and cable variations:
+\begin{align}
+\frac{d\bm{g}}{dt} &= \frac{\partial \bm{g}}{\partial \bm{q}} \dot{\bm{q}} + \frac{\partial \bm{g}}{\partial \bm{l}} \dot{\bm{l}} = \bm{0} \\
+\bm{G}_q \dot{\bm{q}} + \bm{G}_l \dot{\bm{l}} &= \bm{0}
+\end{align}
+
+Where:
+\begin{align}
+\bm{G}_q &= \frac{\partial \bm{g}}{\partial \bm{q}} = \begin{bmatrix}
+\frac{\partial g_1}{\partial q_1} & \cdots & \frac{\partial g_1}{\partial q_{n_j}} \\
+\vdots & \ddots & \vdots \\
+\frac{\partial g_{n_c}}{\partial q_1} & \cdots & \frac{\partial g_{n_c}}{\partial q_{n_j}}
+\end{bmatrix} \\
+\bm{G}_{\rho} &= \frac{\partial \bm{g}}{\partial \bm{\rho}} = \begin{bmatrix}
+\frac{\partial g_1}{\partial \rho_1} & \cdots & \frac{\partial g_1}{\partial \rho_{n_c}} \\
+\vdots & \ddots & \vdots \\
+\frac{\partial g_{n_c}}{\partial \rho_1} & \cdots & \frac{\partial g_{n_c}}{\partial \rho_{n_c}}
+\end{bmatrix}
+\end{align}
+
+\textbf{NOTATION CORRECTION:} Fixed inconsistency - using $\bm{\rho} = [\rho_1, \rho_2]^T$ for cable lengths consistently throughout.
+
+\subsection{Reduced Jacobian}
+Assuming $\bm{G}_{\rho}$ is invertible, we can solve for cable length velocities:
+\begin{align}
+\dot{\bm{\rho}} &= -\bm{G}_{\rho}^{-1} \bm{G}_q \dot{\bm{q}} \\
+\dot{\bm{x}} &= \bm{J}_q \dot{\bm{q}} + \bm{J}_{\rho} \dot{\bm{\rho}} \\
+&= \bm{J}_q \dot{\bm{q}} + \bm{J}_{\rho} (-\bm{G}_{\rho}^{-1} \bm{G}_q \dot{\bm{q}}) \\
+&= (\bm{J}_q - \bm{J}_{\rho} \bm{G}_{\rho}^{-1} \bm{G}_q) \dot{\bm{q}} \\
+&= \bm{J}_{red} \dot{\bm{q}}
+\end{align}
+
+The reduced Jacobian is:
+\begin{align}
+\bm{J}_{red} &= \bm{J}_q - \bm{J}_{\rho} \bm{G}_{\rho}^{-1} \bm{G}_q
+\end{align}
+
+\section{Singularity Analysis}
+
+\subsection{Classification of Singularities}
+Singularities in hybrid serial-cable robots can be classified into several categories based on their physical interpretation and mathematical characteristics.
+
+\subsection{Singularity Types}
+
+\subsubsection{Type I: Serial Chain Singularities}
+For the 2-DOF serial chain, singularities occur when:
+\begin{align}
+\det(\bm{J}_q) &= 0 \\
+\text{where } \det(\bm{J}_q) &= l_2(-l_1 \sin q_1 \cos(q_1 + q_2) + l_1 \cos q_1 \sin(q_1 + q_2)) \\
+&= l_1 l_2 \sin((q_1 + q_2) - q_1) \\
+&= l_1 l_2 \sin q_2
+\end{align}
+
+Therefore, serial chain singularities occur when:
+\begin{align}
+\sin q_2 &= 0 \\
+\Rightarrow q_2 &= 0 \text{ or } q_2 = \pi
+\end{align}
+
+These correspond to:
+\begin{itemize}
+    \item $q_2 = 0$: Fully extended configuration
+    \item $q_2 = \pi$: Fully folded configuration  
+\end{itemize}
+
+\subsubsection{Type II: Cable Constraint Singularities}
+Since both cables attach to the same point M, cable singularities occur when the constraint Jacobian $\bm{G}_q$ becomes singular, meaning the constraint equations become dependent.
+
+\textbf{Geometric Interpretation:}
+Cable singularities occur when the end-effector position cannot be uniquely determined by the cable length constraints, which happens when:
+
+1. \textbf{Collinear Configuration:} End-effector lies on the X-axis ($y_M = 0$):
+\begin{align}
+\text{When } y_M = 0: \quad g_1 &= (x_M + L)^2 - \rho_1^2 = 0 \\
+g_2 &= (x_M - L)^2 - \rho_2^2 = 0
+\end{align}
+
+The constraint gradients become:
+\begin{align}
+\nabla g_1 &= [2(x_M + L), 0] \\
+\nabla g_2 &= [2(x_M - L), 0]
+\end{align}
+
+These are parallel (linearly dependent) when $x_M = 0$.
+
+2. \textbf{Symmetric Configuration:} End-effector on Y-axis ($x_M = 0$):
+\begin{align}
+\rho_1 = \rho_2 = \sqrt{L^2 + y_M^2}
+\end{align}
+
+In this case, both constraints provide the same information about the distance from the X-axis.
+
+\textbf{Mathematical Condition:}
+\begin{align}
+\det(\bm{G}_q) &= 0 \\
+\text{or equivalently: } \quad \text{rank}(\bm{G}_q) &< 2
+\end{align}
+
+\subsubsection{Type III: Combined Singularities}
+Occur when the complete system Jacobian loses rank:
+\begin{align}
+\text{rank}(\bm{J}) &< 3 \\
+\det(\bm{J}\bm{J}^T) &= 0 \quad \text{(for non-square Jacobians)}
+\end{align}
+
+\subsubsection{Type IV: Constraint Singularities}
+Occur when the constraint Jacobian $\bm{G}_l$ becomes singular:
+\begin{align}
+\det(\bm{G}_l) &= 0 \\
+\text{rank}(\bm{G}_l) &< n_c
+\end{align}
+
+This represents configurations where cable length constraints become dependent.
+
+\subsubsection{Type V: Actuation Singularities}
+Occur when the system cannot generate forces in certain directions:
+\begin{align}
+\text{rank}(\bm{J}^T) &< 3
+\end{align}
+
+\subsection{Mathematical Characterization}
+
+\subsubsection{Screw Theory Approach}
+Using screw theory, each joint and cable contributes a twist:
+\begin{align}
+\bm{\xi}_i &= \begin{bmatrix} \bm{\omega}_i \\ \bm{v}_i \end{bmatrix} \quad \text{(joint twist)} \\
+\bm{\zeta}_j &= \begin{bmatrix} \bm{0} \\ \bm{u}_j \end{bmatrix} \quad \text{(cable twist)}
+\end{align}
+
+Where $\bm{u}_j$ is the unit vector along cable $j$.
+
+\subsubsection{Grassmann-Plücker Coordinates}
+For planar motion, singularities can be analyzed using Plücker coordinates:
+\begin{align}
+\bm{L}_{ij} &= \bm{\xi}_i \times \bm{\xi}_j \\
+\text{Singularity: } &\quad \bm{L}_{12} \cdot \bm{L}_{34} = 0
+\end{align}
+
+% Cable Tension Constraints and Negative Tension Analysis
+% This comprehensive analysis is included from a separate file for better organization
+\input{cable_tension_analysis.tex}
+
+\subsection{Singularity Conditions}
+
+\subsubsection{Determinant-Based Analysis}
+For square Jacobians ($n_j + n_c = 3$):
+\begin{align}
+S(\bm{q}, \bm{\rho}) &= \det(\bm{J}(\bm{q}, \bm{\rho})) \\
+&= \det\begin{bmatrix}
+\frac{\partial x_M}{\partial q_1} & \frac{\partial x_M}{\partial q_2} \\
+\frac{\partial y_M}{\partial q_1} & \frac{\partial y_M}{\partial q_2}
+\end{bmatrix} \\
+&= l_1 l_2 \sin q_2
+\end{align}
+
+Singular configurations satisfy:
+\begin{align}
+S(\bm{q}, \bm{\rho}) = 0 \quad \Rightarrow \quad q_2 = n\pi, \quad n \in \mathbb{Z}
+\end{align}
+
+\subsubsection{SVD-Based Analysis}
+Using Singular Value Decomposition:
+\begin{align}
+\bm{J} &= \bm{U} \bm{\Sigma} \bm{V}^T \\
+\sigma_{\min} &= \min(\text{diag}(\bm{\Sigma})) \\
+\kappa(\bm{J}) &= \frac{\sigma_{\max}}{\sigma_{\min}}
+\end{align}
+
+Singularity conditions:
+\begin{align}
+\sigma_{\min} &\approx 0 \\
+\kappa(\bm{J}) &\to \infty
+\end{align}
+
+\subsection{Manipulability Measures}
+
+\subsubsection{Yoshikawa's Manipulability}
+\begin{align}
+\mu(\bm{q}, \bm{l}) &= \sqrt{\det(\bm{J}\bm{J}^T)} \\
+&= \prod_{i=1}^{\text{rank}(\bm{J})} \sigma_i
+\end{align}
+
+\subsubsection{Condition Number}
+\begin{align}
+\kappa(\bm{q}, \bm{l}) &= \|\bm{J}\| \|\bm{J}^{\dagger}\| \\
+&= \frac{\sigma_{\max}}{\sigma_{\min}}
+\end{align}
+
+where $\bm{J}^{\dagger}$ is the Moore-Penrose pseudoinverse.
+
+\section{Advanced Singularity Analysis}
+
+\subsection{Geometric Interpretation}
+
+\subsubsection{Instantaneous Center of Rotation}
+At singular configurations, the instantaneous center of rotation may:
+\begin{enumerate}
+    \item Move to infinity (pure translation)
+    \item Become indeterminate (loss of constraint)
+    \item Coincide with special geometric points
+\end{enumerate}
+
+\subsubsection{Velocity Space Analysis}
+The feasible velocity space is defined by:
+\begin{align}
+\mathcal{V} &= \{\dot{\bm{x}} : \dot{\bm{x}} = \bm{J}\dot{\bm{q}}, \dot{\bm{q}} \in \mathbb{R}^{n_j+n_c}\}
+\end{align}
+
+At singularities, $\dim(\mathcal{V}) < 3$.
+
+\subsection{Bifurcation Analysis}
+
+\subsubsection{Fold Singularities}
+Characterized by:
+\begin{align}
+\det(\bm{J}) &= 0 \\
+\nabla(\det(\bm{J})) &\neq \bm{0}
+\end{align}
+
+\subsubsection{Cusp Singularities}
+Higher-order singularities where:
+\begin{align}
+\det(\bm{J}) &= 0 \\
+\nabla(\det(\bm{J})) &= \bm{0} \\
+\nabla^2(\det(\bm{J})) &\neq \bm{0}
+\end{align}
+
+\subsection{Dynamic Singularities}
+
+\subsubsection{Acceleration Analysis}
+The acceleration equation is:
+\begin{align}
+\ddot{\bm{x}} &= \bm{J}\ddot{\bm{q}} + \dot{\bm{J}}\dot{\bm{q}} \\
+&= \bm{J}\ddot{\bm{q}} + \bm{h}(\bm{q}, \dot{\bm{q}})
+\end{align}
+
+Dynamic singularities occur when:
+\begin{align}
+\bm{h}(\bm{q}, \dot{\bm{q}}) &\notin \text{Range}(\bm{J})
+\end{align}
+
+\section{Workspace Analysis}
+
+\subsection{Workspace Classification}
+
+\subsubsection{Primary Workspace}
+Points reachable with at least one orientation:
+\begin{align}
+\mathcal{W}_1 &= \{(x, y) : \exists \theta, \bm{q}, \bm{l} \text{ s.t. } (x, y, \theta) = \bm{f}(\bm{q}, \bm{l})\}
+\end{align}
+
+\subsubsection{Secondary Workspace}  
+Points reachable with all orientations:
+\begin{align}
+\mathcal{W}_2 &= \{(x, y) : \forall \theta, \exists \bm{q}, \bm{l} \text{ s.t. } (x, y, \theta) = \bm{f}(\bm{q}, \bm{l})\}
+\end{align}
+
+\subsubsection{Dexterous Workspace}
+Points where the manipulability is above a threshold:
+\begin{align}
+\mathcal{W}_d &= \{(x, y) : \mu(\bm{q}, \bm{l}) > \mu_{min}\}
+\end{align}
+
+\subsection{Workspace Boundary}
+The reachable workspace is bounded by:
+\begin{align}
+\mathcal{W} &= \{(x, y) : \exists (\bm{q}, \bm{l}) \text{ such that } (x, y) = \bm{f}(\bm{q}, \bm{l})\} \\
+\text{subject to: } &\quad \bm{q}_{\min} \leq \bm{q} \leq \bm{q}_{\max} \\
+&\quad \bm{l}_{\min} \leq \bm{l} \leq \bm{l}_{\max}
+\end{align}
+
+\subsection{Singular Workspace}
+The singular workspace is defined as:
+\begin{align}
+\mathcal{W}_s &= \{(x, y) \in \mathcal{W} : S(\bm{q}, \bm{l}) = 0\}
+\end{align}
+
+\section{Computational Methods}
+
+\subsection{Efficient Jacobian Computation}
+
+\subsubsection{Analytical Differentiation}
+For computational efficiency, Jacobian elements should be computed analytically:
+\begin{align}
+J_{ij} &= \frac{\partial f_i}{\partial q_j} \\
+&= \sum_{k=j}^{n} \frac{\partial f_i}{\partial T_k} \frac{\partial T_k}{\partial q_j}
+\end{align}
+
+\textbf{Cable Angle Derivatives:}
+When using $\text{atan2}$ for cable angles, the derivatives are:
+\begin{align}
+\frac{\partial \alpha_1}{\partial q_i} &= \frac{\partial}{\partial q_i}\text{atan2}(y_M, x_M + L) \\
+&= \frac{(x_M + L)\frac{\partial y_M}{\partial q_i} - y_M\frac{\partial x_M}{\partial q_i}}{(x_M + L)^2 + y_M^2} \\
+&= \frac{(x_M + L)\frac{\partial y_M}{\partial q_i} - y_M\frac{\partial x_M}{\partial q_i}}{\rho_1^2}
+\end{align}
+
+Similarly for $\alpha_2$:
+\begin{align}
+\frac{\partial \alpha_2}{\partial q_i} &= \frac{(x_M - L)\frac{\partial y_M}{\partial q_i} - y_M\frac{\partial x_M}{\partial q_i}}{\rho_2^2}
+\end{align}
+
+These expressions are well-defined for all configurations, unlike the simple $\arctan$ formulation.
+
+\subsubsection{Recursive Computation}
+Using the recursive Newton-Euler approach:
+\begin{algorithm}
+\caption{Recursive Jacobian Computation}
+\begin{algorithmic}[1]
+\STATE Initialize: $\bm{z}_0 = [0, 0, 1]^T$, $\bm{p}_0 = [0, 0, 0]^T$
+\FOR{$i = 1$ to $n$}
+    \STATE Compute $\bm{z}_i = \bm{R}_{i-1} \bm{z}_{i-1}$
+    \STATE Compute $\bm{p}_i = \bm{p}_{i-1} + \bm{R}_{i-1} \bm{d}_{i-1}$
+    \IF{joint $i$ is revolute}
+        \STATE $\bm{J}_{v,i} = \bm{z}_{i-1} \times (\bm{p}_n - \bm{p}_{i-1})$
+        \STATE $\bm{J}_{\omega,i} = \bm{z}_{i-1}$
+    \ELSE
+        \STATE $\bm{J}_{v,i} = \bm{z}_{i-1}$
+        \STATE $\bm{J}_{\omega,i} = \bm{0}$
+    \ENDIF
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Singularity Detection Algorithms}
+
+\subsubsection{Multi-Method Approach}
+\begin{algorithm}
+\caption{Comprehensive Singularity Detection}
+\begin{algorithmic}[1]
+\REQUIRE Configuration $(\bm{q}, \bm{l})$, tolerances $\epsilon_{det}, \epsilon_{svd}, \kappa_{max}$
+\ENSURE Singularity status and type
+\STATE Compute Jacobian $\bm{J}(\bm{q}, \bm{l})$
+\STATE $method1 \leftarrow |\det(\bm{J})| < \epsilon_{det}$
+\STATE Compute SVD: $\bm{J} = \bm{U}\bm{\Sigma}\bm{V}^T$
+\STATE $\sigma_{min} \leftarrow \min(\text{diag}(\bm{\Sigma}))$
+\STATE $method2 \leftarrow \sigma_{min} < \epsilon_{svd}$
+\STATE $\kappa \leftarrow \sigma_{max}/\sigma_{min}$
+\STATE $method3 \leftarrow \kappa > \kappa_{max}$
+\IF{$method1$ OR $method2$ OR $method3$}
+    \STATE Classify singularity type
+    \RETURN True, singularity\_type
+\ELSE
+    \RETURN False, None
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Adaptive Tolerance Selection}
+The tolerances should be adapted based on:
+\begin{align}
+\epsilon_{det} &= \epsilon_{base} \cdot \|\bm{J}\|_F^{n} \\
+\epsilon_{svd} &= \epsilon_{base} \cdot \|\bm{J}\|_2 \\
+\kappa_{max} &= \frac{1}{\epsilon_{base}}
+\end{align}
+
+Where $\epsilon_{base} = \sqrt{\text{machine precision}}$.
+
+\subsection{Workspace Generation Algorithms}
+
+\subsubsection{Discretization Method}
+\begin{algorithm}
+\caption{Workspace Boundary Detection}
+\begin{algorithmic}[1]
+\REQUIRE Grid resolution $\Delta x, \Delta y$, joint limits
+\ENSURE Workspace boundary points
+\STATE Initialize empty workspace grid
+\FOR{$x = x_{min}$ to $x_{max}$ step $\Delta x$}
+    \FOR{$y = y_{min}$ to $y_{max}$ step $\Delta y$}
+        \STATE solved $\leftarrow$ False
+        \FOR{each orientation $\theta$}
+            \STATE Try to solve inverse kinematics for $(x, y, \theta)$
+            \IF{solution exists within joint limits}
+                \STATE Mark $(x, y)$ as reachable
+                \STATE Check singularity at solution
+                \STATE solved $\leftarrow$ True
+                \STATE break
+            \ENDIF
+        \ENDFOR
+        \IF{NOT solved}
+            \STATE Mark $(x, y)$ as unreachable
+        \ENDIF
+    \ENDFOR
+\ENDFOR
+\STATE Extract boundary from reachable/unreachable interface
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Optimization-Based Methods}
+
+\subsubsection{Singularity-Free Path Planning}
+Minimize proximity to singularities:
+\begin{align}
+\min_{\bm{q}(t), \bm{l}(t)} &\quad \int_0^T \left( \frac{1}{\mu(\bm{q}(t), \bm{l}(t))} + \|\dot{\bm{q}}(t)\|^2 + \|\dot{\bm{l}}(t)\|^2 \right) dt \\
+\text{s.t.} &\quad \bm{x}(t) = \bm{f}(\bm{q}(t), \bm{l}(t)) \\
+&\quad \bm{q}_{min} \leq \bm{q}(t) \leq \bm{q}_{max} \\
+&\quad \bm{l}_{min} \leq \bm{l}(t) \leq \bm{l}_{max}
+\end{align}
+
+\subsubsection{Singularity Avoidance}
+Using null space projection:
+\begin{align}
+\dot{\bm{q}} &= \bm{J}^{\dagger} \dot{\bm{x}}_{desired} + (\bm{I} - \bm{J}^{\dagger}\bm{J}) \bm{k} \\
+\text{where } \bm{k} &= k_0 \nabla_{\bm{q}} \mu(\bm{q}, \bm{l})
+\end{align}
+
+\subsection{Workspace Discretization}
+For workspace analysis:
+\begin{align}
+x_i &= x_{\min} + i \Delta x, \quad i = 0, 1, \ldots, N_x \\
+y_j &= y_{\min} + j \Delta y, \quad j = 0, 1, \ldots, N_y
+\end{align}
+
+\section{Performance Analysis}
+
+\subsection{Computational Complexity}
+
+\subsubsection{Jacobian Computation}
+\begin{itemize}
+    \item Forward kinematics: $O(n_j)$
+    \item Analytical Jacobian: $O(n_j^2 + n_c^2)$  
+    \item Numerical Jacobian: $O((n_j + n_c) \cdot \text{FK cost})$
+\end{itemize}
+
+\subsubsection{Singularity Detection}
+\begin{itemize}
+    \item Determinant: $O(n^3)$ where $n = n_j + n_c$
+    \item SVD: $O(mn^2)$ where $m = \min(3, n_j + n_c)$
+    \item Condition number: Same as SVD
+\end{itemize}
+
+\subsubsection{Workspace Generation}
+For grid resolution $N_x \times N_y$:
+\begin{itemize}
+    \item Discretization method: $O(N_x \cdot N_y \cdot \text{IK cost})$
+    \item Boundary extraction: $O(N_x \cdot N_y)$
+\end{itemize}
+
+\subsection{Accuracy Analysis}
+
+\subsubsection{Numerical Sensitivity}
+The sensitivity of singularity detection to numerical errors:
+\begin{align}
+\frac{d(\det \bm{J})}{d J_{ij}} &= \text{adj}(\bm{J})_{ji} \\
+\text{Relative sensitivity: } &\quad \frac{|J_{ij}|}{|\det \bm{J}|} |\text{adj}(\bm{J})_{ji}|
+\end{align}
+
+\subsubsection{Condition Number Scaling}
+Near singularities, small perturbations cause large changes:
+\begin{align}
+\|\Delta \dot{\bm{x}}\| &\leq \kappa(\bm{J}) \|\Delta \dot{\bm{q}}\| \\
+\text{Amplification factor: } &\quad \kappa(\bm{J}) = \frac{\sigma_{max}}{\sigma_{min}}
+\end{align}
+
+\section{Experimental Validation}
+
+\subsection{Hardware Considerations}
+
+\subsubsection{Sensor Requirements}
+\begin{itemize}
+    \item Joint encoders: Resolution $\geq 2^{12}$ counts/rev
+    \item Cable length sensors: Linear encoders or potentiometers
+    \item Force/torque sensors: For validation of singularity effects
+    \item End-effector pose measurement: Vision system or coordinate measuring machine
+\end{itemize}
+
+\subsubsection{Actuator Limitations}
+Near singularities, required actuator forces may become infinite:
+\begin{align}
+\bm{\tau} &= \bm{J}^T \bm{F}_{external} \\
+\|\bm{\tau}\| &\leq \frac{\|\bm{F}_{external}\|}{\sigma_{min}(\bm{J})}
+\end{align}
+
+\subsection{Validation Protocols}
+
+\subsubsection{Static Singularity Verification}
+\begin{enumerate}
+    \item Move robot to predicted singular configuration
+    \item Apply small end-effector forces in different directions  
+    \item Measure resulting joint torques/cable tensions
+    \item Verify that some directions require infinite force (within measurement limits)
+\end{enumerate}
+
+\subsubsection{Dynamic Response Testing}
+\begin{enumerate}
+    \item Command motion through singular region
+    \item Monitor manipulability index $\mu(t)$
+    \item Record maximum joint velocities and accelerations
+    \item Verify correlation with predicted singular behavior
+\end{enumerate}
+
+\subsection{Benchmark Problems}
+
+\subsubsection{Analytical Test Cases}
+Known singular configurations for validation:
+\begin{itemize}
+    \item Fully extended configuration (boundary singularity)
+    \item Folded configuration (interior singularity)  
+    \item Cable alignment configurations
+    \item Joint limit configurations
+\end{itemize}
+
+\section{Validation and Testing}
+
+\subsection{Systematic Test Framework}
+
+\subsubsection{Unit Tests}
+Individual component validation:
+\begin{itemize}
+    \item Forward kinematics accuracy vs. analytical solutions
+    \item Jacobian computation vs. numerical differentiation
+    \item Singularity detection consistency across methods
+    \item Workspace boundary accuracy
+\end{itemize}
+
+\subsection{Test Cases}
+Comprehensive validation scenarios:
+
+\subsubsection{Known Singular Configurations}
+For the specific robot configuration with parameters $l_1 = 1.0$m, $l_2 = 0.8$m, $L = 1.5$m:
+
+\textbf{Serial Chain Singularities:}
+\begin{align}
+\text{Fully Extended: } &\quad \bm{q}_1 = [0, 0], \quad \bm{p}_M = [1.8, 0] \\
+\text{Fully Folded: } &\quad \bm{q}_2 = [0, \pi], \quad \bm{p}_M = [0.2, 0] \\
+\text{Vertical Extended: } &\quad \bm{q}_3 = [\pi/2, 0], \quad \bm{p}_M = [0, 1.8] \\
+\text{Vertical Folded: } &\quad \bm{q}_4 = [\pi/2, \pi], \quad \bm{p}_M = [0, 0.2]
+\end{align}
+
+\textbf{Cable Singularities:}
+\begin{align}
+\text{X-axis alignment: } &\quad y_M = 0 \text{ (any configuration on X-axis)} \\
+\text{Y-axis symmetry: } &\quad x_M = 0 \text{ (configurations on Y-axis)} \\
+\text{Anchor point proximity: } &\quad \bm{p}_M \approx (-L, 0) \text{ or } (L, 0)
+\end{align}
+
+\textbf{Combined Singularities:}
+\begin{align}
+\text{Origin vicinity: } &\quad \bm{q} = [\pi/2, \pi], \quad \bm{p}_M = [0, 0.2] \\
+\text{Boundary singularity: } &\quad \bm{q} = [0, 0], \quad \bm{p}_M = [1.8, 0]
+\end{align}
+
+\subsubsection{Boundary Conditions}
+Test configurations at workspace boundaries and joint limits.
+
+\subsection{Numerical Tolerances}
+\begin{align}
+\epsilon_{det} &= 10^{-6} \quad \text{(determinant tolerance)} \\
+\epsilon_{svd} &= 10^{-8} \quad \text{(SVD tolerance)} \\
+\kappa_{max} &= 10^{6} \quad \text{(maximum condition number)}
+\end{align}
+
+\section{Practical Implementation Considerations}
+
+\subsection{Real-Time Implementation}
+
+\subsubsection{Computational Optimization}
+For real-time control (typical requirements: $f > 1$ kHz):
+\begin{itemize}
+    \item Pre-compute workspace singularity map offline
+    \item Use lookup tables for dense grid regions
+    \item Implement fast approximation methods for online queries
+    \item Utilize parallel computation for Jacobian elements
+\end{itemize}
+
+\subsubsection{Memory Management}
+\begin{align}
+\text{Workspace map size: } &\quad N_x \times N_y \times N_\theta \times \text{sizeof(float)} \\
+\text{Typical example: } &\quad 100 \times 100 \times 36 \times 4 = 1.44 \text{ MB}
+\end{align}
+
+\subsection{Error Propagation Analysis}
+
+\subsubsection{Parameter Uncertainties}
+Effect of kinematic parameter errors on singularity detection:
+\begin{align}
+\Delta(\det \bm{J}) &= \sum_{i} \frac{\partial(\det \bm{J})}{\partial p_i} \Delta p_i \\
+\text{where } p_i &\in \{L_1, L_2, \ldots, r_1, r_2, \ldots\}
+\end{align}
+
+\subsubsection{Measurement Noise}
+Joint angle measurement errors propagate as:
+\begin{align}
+\bm{\Sigma}_J &= \sum_{i=1}^{n_j} \left(\frac{\partial \bm{J}}{\partial q_i}\right) \sigma_{q_i}^2 \left(\frac{\partial \bm{J}}{\partial q_i}\right)^T
+\end{align}
+
+\subsection{Safety Considerations}
+
+\subsubsection{Singularity Avoidance Zones}
+Define safety margins around singular configurations:
+\begin{align}
+\text{Warning zone: } &\quad \mu(\bm{q}, \bm{l}) < \mu_{warn} \\
+\text{Forbidden zone: } &\quad \mu(\bm{q}, \bm{l}) < \mu_{stop}
+\end{align}
+
+Typical values: $\mu_{warn} = 0.1$, $\mu_{stop} = 0.01$.
+
+\subsubsection{Emergency Procedures}
+When approaching singularities:
+\begin{enumerate}
+    \item Reduce motion speed proportionally to $\mu^{-1}$
+    \item Activate redundancy resolution
+    \item Switch to alternative control strategies
+    \item Emergency stop if no solution exists
+\end{enumerate}
+
+\section{Software Architecture}
+
+\subsection{Class Hierarchy}
+Suggested object-oriented implementation:
+\begin{verbatim}
+class Robot:
+    - parameters: RobotParameters
+    - forward_kinematics(): pose
+    - inverse_kinematics(): joint_config
+    
+class Jacobian:
+    - robot: Robot  
+    - compute_jacobian(): matrix
+    - compute_reduced_jacobian(): matrix
+    
+class SingularityAnalyzer:
+    - jacobian: Jacobian
+    - detect_singularity(): bool, type
+    - compute_manipulability(): float
+    - compute_condition_number(): float
+    
+class WorkspaceAnalyzer:
+    - robot: Robot
+    - analyzer: SingularityAnalyzer
+    - generate_workspace(): workspace_map
+    - plot_singularities(): visualization
+\end{verbatim}
+
+\subsection{Configuration Management}
+Use JSON/YAML for parameter specification:
+\begin{verbatim}
+{
+  "serial_chain": {
+    "n_joints": 2,
+    "link_lengths": [1.0, 0.8],
+    "joint_limits": [[-pi, pi], [-pi, pi]]
+  },
+  "cables": {
+    "n_cables": 2,
+    "anchor_points": [[-1.5, 0.0], [1.5, 0.0]],
+    "length_limits": [[0.5, 3.0], [0.5, 3.0]]
+  },
+  "analysis": {
+    "tolerances": {
+      "determinant": 1e-6,
+      "svd": 1e-8,
+      "condition_max": 1e6
+    },
+    "use_atan2": true
+  }
+}
+\end{verbatim}
+
+\subsection{Implementation Notes for atan2}
+\begin{itemize}
+    \item Use \texttt{numpy.arctan2(y, x)} in Python implementation
+    \item Always pass arguments in correct order: \texttt{atan2(y, x)}
+    \item Handle numerical precision near singular points
+    \item Consider angle wrapping for continuous trajectories
+    \item Use \texttt{math.atan2()} for scalar operations
+\end{itemize}
+
+\textbf{Example Python Implementation:}
+\begin{verbatim}
+import numpy as np
+
+def cable_angles(x_M, y_M, L):
+    """Compute cable angles using atan2"""
+    alpha_1 = np.arctan2(y_M, x_M + L)
+    alpha_2 = np.arctan2(y_M, x_M - L)
+    return alpha_1, alpha_2
+
+def cable_angle_derivatives(x_M, y_M, dx_dq, dy_dq, L):
+    """Compute derivatives of cable angles w.r.t joint variables"""
+    rho_1_sq = (x_M + L)**2 + y_M**2
+    rho_2_sq = (x_M - L)**2 + y_M**2
+    
+    dalpha1_dq = ((x_M + L) * dy_dq - y_M * dx_dq) / rho_1_sq
+    dalpha2_dq = ((x_M - L) * dy_dq - y_M * dx_dq) / rho_2_sq
+    
+    return dalpha1_dq, dalpha2_dq
+\end{verbatim}
+
+\section{References and Further Reading}
+
+\subsection{Primary References}
+\begin{enumerate}
+\item Original paper: AJEASSP 2022, pages 197-208
+\item Gosselin, C., Angeles, J.: "Singularity analysis of closed-loop kinematic chains", IEEE Trans. Robotics and Automation, 1990
+\item Ma, O., Angeles, J.: "Architecture singularities of platform manipulators", IEEE Int. Conf. Robotics and Automation, 1991
+\item Merlet, J.P.: "Parallel Robots", Springer, 2006
+\item Salisbury, J.K., Craig, J.J.: "Articulated hands: Force control and kinematic issues", Int. J. Robotics Research, 1982
+\end{enumerate}
+
+\subsection{Supplementary References}
+\begin{enumerate}
+\item Spong, M.W., Hutchinson, S., Vidyasagar, M.: "Robot Modeling and Control", Wiley, 2020
+\item Craig, J.J.: "Introduction to Robotics: Mechanics and Control", Pearson, 2017
+\item Lynch, K.M., Park, F.C.: "Modern Robotics", Cambridge University Press, 2017
+\item Siciliano, B., Khatib, O.: "Springer Handbook of Robotics", Springer, 2016
+\end{enumerate}
+
+\subsection{Cable-Driven Robot Specific}
+\begin{enumerate}
+\item Kawamura, S., et al.: "Development of an ultrahigh speed robot FALCON using wire drive system", IEEE Int. Conf. Robotics and Automation, 1995
+\item Albus, J., et al.: "The NIST robocrane", J. Robotic Systems, 1993
+\item Verhoeven, R.: "Analysis of the workspace of tendon-based Stewart platforms", PhD thesis, University of Duisburg-Essen, 2004
+\end{enumerate}
+
+\input{notation_appendix.tex}
+
+\section{Derivation Details}
+% TODO: Add detailed mathematical derivations
+
+\section{Code Implementation Notes}
+% TODO: Add implementation-specific notes and algorithms
+
+\end{document}
