@@ -812,6 +812,13 @@ For static equilibrium, we apply three fundamental conditions at each joint:
     \item $\sum M = 0$ (moment balance about joint)
 \end{enumerate}
 
+\begin{figure}[H]
+\centering
+\input{link1_force_diagram}
+\caption{Force diagram for Link 1 showing all forces and moments acting about joint O. The force components $X_m$ and $Y_m$ represent the forces transmitted from Link 2 through the joint connection, which ultimately originate from the cable tensions $T_1$ and $T_2$ acting on the end-effector.}
+\label{fig:link1_force_diagram}
+\end{figure}
+
 \subparagraph{Deriving Link 1 Equilibrium (Joint $O$)}
 
 \textbf{Step 1: Identify all forces acting on Link 1}
@@ -823,67 +830,6 @@ Consider the free body diagram of link 1:
     \item Reaction force from base: $\mathbf{R}_O = [X_{r1}, Y_{r1}]^T$ (at joint $O$)
     \item Applied torque from motors/cables at $O$: $\tau_1$ (if any)
 \end{itemize}
-
-\textbf{Step 2: Apply force balance equations}
-
-For horizontal forces:
-
-\noindent\textit{Horizontal equilibrium:}
-$$\sum F_x = 0: \quad X_{r1} + X_m = 0$$
-
-$X_m$ represents the horizontal force transmitted from link 2 through link 1 to the base. This force comes from the horizontal components of cable tensions acting on the end-effector:
-
-$$X_m = T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2)$$
-
-Therefore: $$\boxed{X_m = T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2)}$$
-
-This is the corrected Equation (411a) including contributions from both cables.
-
-For vertical forces:
-
-\noindent\textit{Vertical equilibrium:}
-$$\sum F_y = 0: \quad Y_{r1} + Y_m - m_1 g = 0$$
-
-Rearranging:
-$$\boxed{Y_m + Y_{r1} - m_1 g = 0}$$
-
-This is Equation (411b). The vertical reaction force must balance the weight minus the upward component of transmitted force from link 2.
-
-\textbf{Step 3: Apply moment balance about joint $O$}
-
-Taking moments about the base joint $O$:
-$$\sum M_O = 0$$
-
-The moment contributions are:
-\begin{itemize}
-    \item Gravitational moment: $m_1 g \cdot \frac{l_1}{2} \cos(q_1)$ (acts perpendicular to link 1)
-    \item Moment from force $\mathbf{F}_{12}$: perpendicular distance from $O$ to force
-    \item Moment from reaction forces: perpendicular distance from $O$ times force magnitude
-\end{itemize}
-
-For force $\mathbf{F}_{12} = [X_m, Y_m]^T$ acting at distance $l_1$ along link 1:
-\begin{itemize}
-    \item $X_m$ contributes moment: $X_m \cdot l_1 \cos(q_1)$ (perpendicular distance)
-    \item $Y_m$ contributes moment: $Y_m \cdot l_1 \sin(q_1)$ (perpendicular distance)
-\end{itemize}
-
-For reaction force $\mathbf{R}_O = [X_{r1}, Y_{r1}]^T$ at the joint:
-\begin{itemize}
-    \item Creates moment: $-l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1}$
-\end{itemize}
-
-Moment equation:
-$$-l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1} = m_1 g \cdot \frac{l_1}{2} \cos(q_1)$$
-
-Simplifying:
-$$\boxed{-l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1} = \frac{1}{2} m_1 g l_1 \cos(q_1)} \quad \text{[Equation 411c]}$$
-
-\begin{figure}[H]
-\centering
-\input{link1_force_diagram}
-\caption{Force diagram for Link 1 showing all forces and moments acting about joint O. The force components $X_m$ and $Y_m$ represent the forces transmitted from Link 2 through the joint connection, which ultimately originate from the cable tensions $T_1$ and $T_2$ acting on the end-effector.}
-\label{fig:link1_force_diagram}
-\end{figure}
 
 \subparagraph{Deriving Link 2 Equilibrium (Joint $A$)}
 

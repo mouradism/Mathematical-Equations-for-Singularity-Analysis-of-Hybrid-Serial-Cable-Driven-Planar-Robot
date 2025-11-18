@@ -209,10 +209,10 @@ visualizer.show()
 
 ## Research Paper Reference
 - Title: [Add full title from the paper]
-- Authors: [Add authors]
+- Authors: 
 - Journal: AJEASSP 2022
 - Pages: 197-208
-- DOI: [Add DOI if available]
+- DOI: 
 
 ## Notes
 - All angles in radians unless specified
