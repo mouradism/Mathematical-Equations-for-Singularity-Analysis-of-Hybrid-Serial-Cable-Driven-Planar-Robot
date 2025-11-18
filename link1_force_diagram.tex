@@ -2,10 +2,9 @@
 
 % Define colors
 \definecolor{linkcolor}{RGB}{70,130,180}
-\definecolor{jointcolor}{RGB}{220,20,60}  
+\definecolor{forcecolor}{RGB}{220,20,60}
 \definecolor{reactioncolor}{RGB}{255,140,0}
 \definecolor{weightcolor}{RGB}{34,139,34}
-\definecolor{linkforcecolor}{RGB}{148,0,211}
 
 % Link 1 geometry
 \coordinate (O) at (0,0);  % Base joint O (fixed base)
@@ -50,12 +49,12 @@
 \node[reactioncolor, above right] at ([shift={(0.6,0.4)}] O) {\Large on Link 1};
 
 % 3. Joint reaction forces at A (what Link 2 exerts ON Link 1)
-\draw[->, very thick, jointcolor] (A) -- +(-1,0) node[above] {\Large $-X_A$};
-\draw[->, very thick, jointcolor] (A) -- +(0,-1) node[right] {\Large $-Y_A$};
-\node[jointcolor, below left] at ([shift={(-0.5,-0.5)}] A) {\Large Joint reaction};
-\node[jointcolor, below left] at ([shift={(-0.5,-0.7)}] A) {\Large from Link 2};
+\draw[->, very thick, forcecolor] (A) -- +(-1,0) node[above] {\Large $-X_A$};
+\draw[->, very thick, forcecolor] (A) -- +(0,-1) node[right] {\Large $-Y_A$};
+\node[forcecolor, below left] at ([shift={(-0.5,-0.5)}] A) {\Large Joint reaction};
+\node[forcecolor, below left] at ([shift={(-0.5,-0.7)}] A) {\Large from Link 2};
 
-% 4. Show the transmitted cable forces (represented in X_m, Y_m)
+% 4. Show the transmitted cable forces (represented in X_A, Y_A)
 \coordinate (CableRef) at ([shift={(1.5,1)}] A);
 \draw[dashed, gray] (A) -- (CableRef);
 \node[gray, above] at (CableRef) {\scriptsize Cable forces};
