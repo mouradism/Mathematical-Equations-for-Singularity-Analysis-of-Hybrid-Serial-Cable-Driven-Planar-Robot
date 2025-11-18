@@ -78,20 +78,23 @@
 
 % === MOMENT BALANCE ===
 \node[align=left, below] at (0,-4.5) {
-\Large \textbf{Moment Balance about Joint O:} \\
-\Large $\sum M_O = 0$ \\
-\Large $X_A \cdot l_1\sin(q_1) + Y_A \cdot l_1\cos(q_1) - \frac{1}{2}m_1 g l_1\cos(q_1) = 0$
+\Large \textbf{Moment Balance about Joint O:} \\[0.2cm]
+\Large $\sum M_O = 0$ \\[0.3cm]
+\Large $X_A \cdot l_1\sin(q_1) + Y_A \cdot l_1\cos(q_1)$ \\
+\Large $\quad - \frac{1}{2}m_1 g l_1\cos(q_1) = 0$
 };
 
 % === SIGN CONVENTION NOTE ===
-\node[align=center, draw, fill=yellow!20, above] at (4.5,2.5) {
-\textbf{Sign Convention:} \\
-$X_{O1}, Y_{O1} > 0$: Ground reactions \\
-$X_A, Y_A > 0$: Forces Link 1 \\
-applies \textbf{TO} Link 2 \\
-$m_1 g$: Weight acts downward \\
-\textbf{Newton's 3rd Law:} Link 2 applies \\
-$-X_A, -Y_A$ to Link 1
+\node[align=center, draw, fill=yellow!20, text width=3cm] at (5.5,1.5) {
+\small \textbf{Sign Convention:} \\[0.1cm]
+\small $X_{O1}, Y_{O1} > 0$: \\
+\small Ground reactions \\[0.1cm]
+\small $X_A, Y_A > 0$: Forces \\
+\small Link 1 applies TO Link 2 \\[0.1cm]
+\small $m_1 g$: Weight downward \\[0.1cm]
+\small \textbf{Newton's 3rd Law:} \\
+\small Link 2 applies $-X_A, -Y_A$ \\
+\small to Link 1
 };
 
 \end{tikzpicture}
