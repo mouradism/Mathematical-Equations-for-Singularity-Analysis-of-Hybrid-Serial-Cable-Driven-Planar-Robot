@@ -821,26 +821,49 @@ For static equilibrium, we apply three fundamental conditions at each joint:
 
 \subparagraph{Deriving Link 1 Equilibrium (Joint $O$)}
 
-\textbf{Step 1: Identify all forces acting on Link 1}
-
-Consider the free body diagram of link 1:
+From Figure \ref{fig:link1_force_diagram}, applying Newton's laws to Link 1 gives us a system of three equilibrium equations. The forces acting on Link 1 are:
 \begin{itemize}
-    \item Weight: $W_1 = m_1 g$ (acting downward at link center, distance $\frac{l_1}{2}$ from $O$)
-    \item Force from Link 2: $\mathbf{F}_{12} = [X_m, Y_m]^T$ (transmitted through the joint)
-    \item Reaction force from base: $\mathbf{R}_O = [X_{r1}, Y_{r1}]^T$ (at joint $O$)
-    \item Applied torque from motors/cables at $O$: $\tau_1$ (if any)
+    \item Weight: $m_1 g$ (acting downward at link center)
+    \item Joint forces from Link 2: $X_A, Y_A$ (transmitted through joint $A$)
+    \item Base reaction forces: $X_{O1}, Y_{O1}$ (at joint $O$)
 \end{itemize}
+
+The complete equilibrium system for Link 1 is:
+
+\begin{equation}
+\left\{
+\begin{aligned}
+X_{O1} &= X_A \\
+Y_{O1} &= Y_A + m_1 g \\
+X_A \sin(q_1) - Y_A \cos(q_1) &= \frac{1}{2}m_1 g \cos(q_1)
+\end{aligned}
+\right.
+\tag{420}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item \textbf{First equation:} Horizontal force balance ($\sum F_x = 0$)
+    \item \textbf{Second equation:} Vertical force balance ($\sum F_y = 0$)  
+    \item \textbf{Third equation:} Moment balance about joint $O$ ($\sum M_O = 0$)
+\end{itemize}
+
+\textbf{Physical interpretation:} This system shows that:
+\begin{itemize}
+    \item The base reactions $X_{O1}, Y_{O1}$ directly support the transmitted forces $X_A, Y_A$ plus Link 1's own weight
+    \item The moment equilibrium relates the transmitted forces to the gravitational moment on Link 1
+    \item The transmitted forces $X_A, Y_A$ are determined from Link 2 equilibrium (Equation 419), which explicitly contains the cable tensions $T_1, T_2$
+\end{itemize}
+
+\textbf{Solution methodology:} Link 2 equilibrium (419) is solved first to determine $X_A, Y_A$ in terms of cable tensions. Then Link 1 equilibrium (420) determines the base reactions. This sequential approach avoids circular reasoning in the cable tension calculations.
 
 \subparagraph{Deriving Link 2 Equilibrium (Joint $A$)}
 
-\textbf{Step 1: Identify all forces acting on Link 2}
-
-Consider the free body diagram of link 2:
+From Figure \ref{fig:link2_fbd}, applying Newton's laws to Link 2 gives us a system of three equilibrium equations. The forces acting on Link 2 are:
 \begin{itemize}
-    \item Weight: $W_2 = m_2 g$ (acting downward at link center, distance $\frac{l_2}{2}$ from joint)
-    \item Cable force: $\mathbf{T} = [T_1, T_2]^T$ (but appears as force $[X_A, Y_A]$ after projection)
-    \item Reaction force from link 1 at joint $A$: $\mathbf{R}_A = [X_A, Y_A]^T$ (equal and opposite to $\mathbf{F}_{12}$ by Newton's 3rd law)
-    \item Internal constraint forces from cable geometry
+    \item Weight: $m_2 g$ (acting downward at link center)
+    \item Cable tensions: $T_1, T_2$ (acting at end-effector point $M$)
+    \item Joint forces from Link 1: $X_A, Y_A$ (transmitted through joint $A$)
 \end{itemize}
 
 \begin{figure}[H]
@@ -900,86 +923,65 @@ Consider the free body diagram of link 2:
 \label{fig:link2_fbd}
 \end{figure}
 
-\textbf{Sign Convention Analysis:}
+The complete equilibrium system for Link 2 is:
 
-From Figure \ref{fig:link2_fbd}, the sign conventions are:
+\begin{equation}
+\left\{
+\begin{aligned}
+X_A &= -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2) \\
+Y_A &= m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) \\
+l_2[T_1 \sin(\alpha_1 + q_1 + q_2) + T_2 \sin(\alpha_2 + q_1 + q_2)] &= \frac{1}{2}m_2 g l_2 \cos(q_2)
+\end{aligned}
+\right.
+\tag{419}
+\end{equation}
+
+where:
 \begin{itemize}
-    \item $X_A, Y_A > 0$: Forces that Link 1 applies \textbf{TO} Link 2 (positive coordinate directions)
-    \item Cable forces $T_1, T_2$: Always positive magnitudes, directions determined by angles $\alpha_1, \alpha_2$
-    \item Weight $m_2 g$: Acts downward (negative $y$-direction)
-    \item Cable angles $\alpha_1, \alpha_2$: Measured from positive $x$-axis to cable direction
+    \item \textbf{First equation:} Horizontal force balance ($\sum F_x = 0$)
+    \item \textbf{Second equation:} Vertical force balance ($\sum F_y = 0$)  
+    \item \textbf{Third equation:} Moment balance about joint $A$ ($\sum M_A = 0$)
 \end{itemize}
 
-\textbf{Step 2: Apply force balance equations}
-
-The cable tensions act along specific directions determined by cable geometry. **Both cables** $T_1$ and $T_2$ apply forces to the end-effector at point M. The net force components are:
-
-For horizontal forces:
-$$\sum F_x = 0: \quad X_A + T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2) = 0$$
-
-where $\alpha_1, \alpha_2$ are the cable angles relative to horizontal at the end-effector.
-$$\boxed{X_A = -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2)} \quad \text{[Equation 412a - Corrected]}$$
-
-For vertical forces:
-$$\sum F_y = 0: \quad Y_A + T_1 \sin(\alpha_1) + T_2 \sin(\alpha_2) - m_2 g = 0$$
-
-This shows the vertical force at point $A$ must balance:
+\textbf{Physical interpretation:} This system shows that:
 \begin{itemize}
-    \item The vertical components of both cable tensions: $T_1 \sin(\alpha_1) + T_2 \sin(\alpha_2)$
-    \item The weight of link 2: $m_2 g$
+    \item The joint forces $X_A, Y_A$ are directly determined by the cable tensions $T_1, T_2$ and Link 2's weight
+    \item Both cables contribute to the horizontal and vertical force components through their geometric projections
+    \item The moment equilibrium relates cable tensions to the gravitational moment on Link 2
+    \item Cable angles $\alpha_1, \alpha_2$ and joint angle $q_2$ determine the force and moment distributions
 \end{itemize}
 
-$$\boxed{Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2)} \quad \text{[Equation 412b - Corrected]}$$
+\textbf{Solution methodology:} This system (419) is solved first to determine the cable tensions $T_1, T_2$ for given external forces and robot configuration. The resulting joint forces $X_A, Y_A$ are then used in Link 1 equilibrium (420) to find base reactions.
 
-\textbf{Step 3: Apply moment balance about joint A}
+\subparagraph{Complete Equilibrium Framework}
 
-Taking moments about joint A (connection between links 1 and 2):
-$$\sum M_A = 0$$
+The complete equilibrium analysis consists of two coupled systems that must be solved sequentially:
 
-Moment contributions:
-\begin{itemize}
-    \item \textbf{Gravitational moment}: $m_2 g \cdot \frac{l_2}{2} \cos(q_2)$ (weight acts at center of link 2)
-    \item \textbf{Cable force moments}: Cable forces $T_1, T_2$ act at end-effector M, distance $l_2$ from joint A
-    \item \textbf{Joint reaction forces}: $X_A, Y_A$ act at joint A (zero moment arm)
-\end{itemize}
+\textbf{Link 2 Equilibrium System (419) - Solved First:}
+\begin{equation}
+\left\{
+\begin{aligned}
+X_A &= -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2) \\
+Y_A &= m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) \\
+l_2[T_1 \sin(\alpha_1 + q_1 + q_2) + T_2 \sin(\alpha_2 + q_1 + q_2)] &= \frac{1}{2}m_2 g l_2 \cos(q_2)
+\end{aligned}
+\right.
+\tag{419}
+\end{equation}
 
-The cable forces create moments about joint A:
-\begin{itemize}
-    \item $T_1$ horizontal component: $T_1 \cos(\alpha_1) \cdot l_2 \sin(q_2)$ 
-    \item $T_1$ vertical component: $T_1 \sin(\alpha_1) \cdot l_2 \cos(q_2)$
-    \item $T_2$ horizontal component: $T_2 \cos(\alpha_2) \cdot l_2 \sin(q_2)$
-    \item $T_2$ vertical component: $T_2 \sin(\alpha_2) \cdot l_2 \cos(q_2)$
-\end{itemize}
+\textbf{Link 1 Equilibrium System (420) - Solved Second:}
+\begin{equation}
+\left\{
+\begin{aligned}
+X_{O1} &= X_A \\
+Y_{O1} &= Y_A + m_1 g \\
+X_A \sin(q_1) - Y_A \cos(q_1) &= \frac{1}{2}m_1 g \cos(q_1)
+\end{aligned}
+\right.
+\tag{420}
+\end{equation}
 
-The complete moment equation becomes:
-$$T_1 \cos(\alpha_1) \cdot l_2 \sin(q_2) + T_1 \sin(\alpha_1) \cdot l_2 \cos(q_2) + T_2 \cos(\alpha_2) \cdot l_2 \sin(q_2) + T_2 \sin(\alpha_2) \cdot l_2 \cos(q_2) = m_2 g \cdot \frac{l_2}{2} \cos(q_2)$$
-
-Factoring out $l_2$:
-$$\boxed{l_2[T_1(\cos(\alpha_1) \sin(q_2) + \sin(\alpha_1) \cos(q_2)) + T_2(\cos(\alpha_2) \sin(q_2) + \sin(\alpha_2) \cos(q_2))] = \frac{1}{2} m_2 g l_2 \cos(q_2)} \quad \text{[Equation 412c - Corrected]}$$
-
-Using trigonometric identity $\cos(A)\sin(B) + \sin(A)\cos(B) = \sin(A+B)$:
-$$\boxed{l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)} \quad \text{[Equation 412c - Final]}$$
-
-\subparagraph{General Equilibrium Framework}
-
-With the corrected force definitions, the equilibrium equations become:
-
-\textbf{From the force balance analysis:}
-\begin{align}
-X_m &= T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2) && \text{[Equation 411a]} \\
-X_{r1} + X_m &= 0 && \text{[Horizontal equilibrium]} \\
-Y_{r1} + Y_m - m_1 g &= 0 && \text{[Vertical equilibrium]} \\
--l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1} &= \frac{1}{2} m_1 g l_1 \cos(q_1) && \text{[Moment equilibrium]}
-\end{align}
-
-\textbf{For Link 2 (end-effector):}
-\begin{align}
-X_A &= -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2) && \text{[Equation 412a]} \\
-Y_A &= m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) && \text{[Equation 412b]} \\
-l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] &= \frac{1}{2} m_2 g l_2 \cos(q_2) && \text{[Equation 412c]}
-\end{align}
-
-These equations show the direct relationship between cable tensions $(T_1, T_2)$ and internal force distribution.
+This framework shows the direct relationship between cable tensions $(T_1, T_2)$ and the complete force distribution throughout the robot structure.
 
 \paragraph{Joint Equilibrium Conditions}
 
@@ -987,115 +989,81 @@ For the hybrid serial-cable robot, equilibrium at each joint is established when
 
 \subparagraph{Equilibrium at Joint $O$ (Base Joint - Link 1)}
 
-At the base joint $O$ connecting link 1 to the fixed platform, force and moment balance requires:
+At the base joint $O$ connecting Link 1 to the fixed platform, the equilibrium is governed by system (420):
 
 \begin{equation}
-\begin{cases}
-X_m = T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2) \\
-Y_m + Y_{r1} - m_1 g = 0 \\
--l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1} = \frac{1}{2} m_1 g l_1 \cos(q_1)
-\end{cases}
-\label{eq:joint_O_equilibrium}
+\left\{
+\begin{aligned}
+X_{O1} &= X_A \\
+Y_{O1} &= Y_A + m_1 g \\
+X_A \sin(q_1) - Y_A \cos(q_1) &= \frac{1}{2}m_1 g \cos(q_1)
+\end{aligned}
+\right.
+\tag{420}
 \end{equation}
 
 \textbf{Component Explanation:}
 
 \begin{itemize}
-    \item \textbf{Equation (411a) - Horizontal force balance:}
-    $$X_m = T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2)$$
+    \item \textbf{First equation - Horizontal force balance:}
+    $$X_{O1} = X_A$$
     
-    The horizontal force transmitted from link 2 through link 1 to the base joint equals the sum of horizontal components of both cable tensions acting on the end-effector.
+    The horizontal base reaction force equals the horizontal force transmitted from Link 2 through joint $A$.
     
-    \textbf{Physical interpretation:} Cable tensions create horizontal forces that must be transmitted through the mechanical linkage to the base support structure.
+    \item \textbf{Second equation - Vertical force balance:}
+    $$Y_{O1} = Y_A + m_1 g$$
     
-    \item \textbf{Equation (411b) - Vertical force balance:}
-    $$Y_m + Y_{r1} - m_1 g = 0 \implies Y_{r1} = m_1 g - Y_m$$
-    The vertical force at joint $O$ (reaction force $Y_{r1}$) must support the weight of link 1 ($m_1 g$) minus the upward vertical component of the cable force ($Y_m$). This shows how cable tension partially offloads gravity.
+    The vertical base reaction must support both the transmitted force from Link 2 ($Y_A$) and Link 1's own weight ($m_1 g$).
     
-    \item \textbf{Equation (411c) - Moment balance about joint $O$:}
-    $$-l_1 \sin(q_1) X_{r1} + l_1 \cos(q_1) Y_{r1} = \frac{1}{2} m_1 g l_1 \cos(q_1)$$
+    \item \textbf{Third equation - Moment balance about joint $O$:}
+    $$X_A \sin(q_1) - Y_A \cos(q_1) = \frac{1}{2}m_1 g \cos(q_1)$$
     
-    This moment equation equates:
-    \begin{itemize}
-        \item \textbf{Left side:} Moment from reaction forces at the base
-        \begin{itemize}
-            \item $l_1 \sin(q_1)$ component multiplies $X_{r1}$ (horizontal reaction)
-            \item $l_1 \cos(q_1)$ component multiplies $Y_{r1}$ (vertical reaction)
-        \end{itemize}
-        \item \textbf{Right side:} Gravitational moment about joint $O$
-        \begin{itemize}
-            \item $\frac{1}{2} m_1 g l_1$: Gravity acts at link center (distance $\frac{l_1}{2}$)
-            \item $\cos(q_1)$: Moment arm projection depends on link orientation
-        \end{itemize}
-    \end{itemize}
-    
-    \textbf{Physical Interpretation:} At joint $O$, the reaction forces must create a counter-moment to balance gravity's tendency to rotate link 1. The moment arm changes with link angle $q_1$, meaning equilibrium is configuration-dependent.
+    The moments from transmitted forces $X_A, Y_A$ must balance the gravitational moment on Link 1. This equation determines the relationship between joint forces and robot configuration.
 \end{itemize}
 
-\subparagraph{Equilibrium at Point $A$ (End-Effector Attachment - Link 2)}
+\subparagraph{Equilibrium at Joint $A$ (Link 2 - End-Effector)}
 
-At the end-effector attachment point $A$ where cable forces are applied to link 2, force and moment balance yields:
+At joint $A$ where Link 2 connects to the end-effector and cable forces are applied, the equilibrium is governed by system (419):
 
 \begin{equation}
-\begin{cases}
-X_A = -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2) \\
-Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) \\
-l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)
-\end{cases}
-\label{eq:joint_A_equilibrium}
+\left\{
+\begin{aligned}
+X_A &= -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2) \\
+Y_A &= m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) \\
+l_2[T_1 \sin(\alpha_1 + q_1 + q_2) + T_2 \sin(\alpha_2 + q_1 + q_2)] &= \frac{1}{2}m_2 g l_2 \cos(q_2)
+\end{aligned}
+\right.
+\tag{419}
 \end{equation}
 
 \textbf{Component Explanation:}
 
 \begin{itemize}
-    \item \textbf{Equation (412a) - Horizontal force balance:}
+    \item \textbf{First equation - Horizontal force balance:}
     $$X_A = -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2)$$
-    The horizontal force at point $A$ results from the horizontal components of **both** cable tensions. Cable angles $\alpha_1, \alpha_2$ are measured relative to horizontal at the end-effector position.
     
-    \item \textbf{Equation (412b) - Vertical force balance:}
+    The horizontal joint force results from the horizontal components of both cable tensions acting on the end-effector.
+    
+    \item \textbf{Second equation - Vertical force balance:}
     $$Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2)$$
-    The vertical force at point $A$ must balance:
-    \begin{itemize}
-        \item The weight of link 2: $m_2 g$ (downward)
-        \item The vertical components of both cable tensions: $T_1 \sin(\alpha_1) + T_2 \sin(\alpha_2)$ (upward)
-    \end{itemize}
-    Both cables contribute to supporting the gravitational load, with their contributions depending on the cable geometry angles $\alpha_1, \alpha_2$.
     
-    \item \textbf{Equation (412c) - Moment balance about joint A:}
-    $$l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)$$
+    The vertical joint force balances Link 2's weight against the vertical components of both cable tensions.
     
-    This corrected moment balance properly accounts for cable force contributions:
-    \begin{itemize}
-        \item \textbf{Left side}: Moments from cable forces $T_1, T_2$ acting at end-effector M
-        \item Cable angle terms: $(\alpha_i + q_2)$ represent total angle from horizontal to cable direction
-        \item \textbf{Right side}: Gravitational moment about joint A from link 2's center of mass
-        \item Joint reaction forces $X_A, Y_A$ create no moment (zero moment arm about joint A)
-    \end{itemize}
+    \item \textbf{Third equation - Moment balance about joint A:}
+    $$l_2[T_1 \sin(\alpha_1 + q_1 + q_2) + T_2 \sin(\alpha_2 + q_1 + q_2)] = \frac{1}{2}m_2 g l_2 \cos(q_2)$$
     
-    \textbf{Physical Interpretation:} The moment balance determines how cable forces $X_A, Y_A$ must be oriented to counteract gravity on link 2. This constrains the cable geometry and explains why certain configurations become singular.
+    The moments from cable forces at the end-effector must balance the gravitational moment about joint $A$. This determines the required cable tension relationship for equilibrium.
 \end{itemize}
 
-\subparagraph{Corrected Equation (411a) - Force Transmission Through Linkage}
+\textbf{Solution Methodology:}
 
-\textbf{Final Corrected Form:}
+The two equilibrium systems are solved sequentially:
+\begin{enumerate}
+    \item \textbf{Solve system (419) first} to determine cable tensions $T_1, T_2$ and joint forces $X_A, Y_A$
+    \item \textbf{Use results in system (420)} to find base reaction forces $X_{O1}, Y_{O1}$
+\end{enumerate}
 
-For the hybrid serial-cable system, equation (411a) correctly expresses:
-
-$$X_m = T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2)$$
-
-\textbf{Physical Interpretation:}
-
-\begin{itemize}
-    \item $X_m$: Horizontal force transmitted from link 2 through link 1 to the base joint [N]
-    \item This force equals the sum of horizontal components of both cable tensions acting on the end-effector
-    \item The mechanical linkage transmits these cable forces to the base support structure
-    \item Cable angles $\alpha_1, \alpha_2$ determine the horizontal force contributions
-    \item This force must be reacted by the base joint constraint forces $X_{r1} = -X_m$
-\end{itemize}
-
-\textbf{Key Physical Insight:}
-
-The two-link serial mechanism acts as a force transmission pathway, carrying horizontal cable forces from the end-effector to the base joint. This is fundamentally different from assuming zero horizontal force.
+This approach ensures no circular dependencies and provides a clear force transmission pathway from cable tensions through the mechanical linkage to the base support structure.
 
 \textbf{Corrected Equilibrium Framework:}
 
@@ -1130,20 +1098,9 @@ Cable tensions create torques at joints through the cable geometry:
 
 where $g_1, g_2$ are gravitational torques at joints 1 and 2.
 
-\textbf{Resolution of the Original Equation (411a):}
+\textbf{Resolution Using the Complete Equilibrium Framework:}
 
-The original equation should be interpreted as part of the internal force distribution within the links, not as the primary equilibrium condition. The cable tensions $T_1, T_2$ are determined by the joint torque equilibrium equations above, and then the internal forces ($X_m, Y_m, X_A, Y_A$) are found by solving the link force balance equations.
-
-\textbf{Physical Meaning:}
-
-In a properly formulated cable-driven system:
-\begin{enumerate}
-    \item \textbf{Cable tensions are determined} by joint torque balance with gravity
-    \item \textbf{Internal forces emerge} from force transmission through the mechanical links  
-    \item \textbf{No dimensional mixing} occurs between forces and torques
-\end{enumerate}
-
-This correction resolves the dimensional inconsistency and provides a physically meaningful foundation for the equilibrium analysis.
+The corrected equilibrium analysis uses a two-stage sequential solution methodology. First, cable tensions $T_1, T_2$ are determined from the Link 2 equilibrium system (420), then these known tensions are used to solve the Link 1 equilibrium system (419) for internal forces ($X_m, Y_m, X_A, Y_A$). This eliminates circular dependencies and provides a clear solution path.
 
 \subparagraph{Combined Matrix Form of Equilibrium Equations}
 
@@ -1245,7 +1202,7 @@ This approach:
     
     \item \textbf{Row 6:} Link 2 moment balance
     \begin{equation}
-    l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)
+    l_2[T_1 \sin(\alpha_1 + q_1 + q_2) + T_2 \sin(\alpha_2 + q_1 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)
     \end{equation}
     Moment equilibrium about joint A due to cable forces acting at end-effector M.
     
@@ -1344,19 +1301,19 @@ At singular configurations where $\det(\mathbf{J}_{\rho}) = 0$, these equations 
 
 \textbf{Step 1: Two-Cable System Analysis}
 
-From the corrected equations (412a)–(412c), we have a system with **two cable tensions** $T_1$ and $T_2$:
+From the Link 2 equilibrium system (420), we have the complete force and moment balance with **two cable tensions** $T_1$ and $T_2$:
 
 \begin{itemize}
-    \item Horizontal force (412a): $X_A = -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2)$
-    \item Vertical force (412b): $Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2)$
-    \item Moment balance (412c): $l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)$
+    \item Horizontal force: $X_A = -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2)$
+    \item Vertical force: $Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2)$
+    \item Moment balance: $l_2[T_1 \sin(\alpha_1 + q_1 + q_2) + T_2 \sin(\alpha_2 + q_1 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2)$
 \end{itemize}
 
 **Key Observation**: This is a **two-cable system** with two unknowns $(T_1, T_2)$ and three equations. The system is **overconstrained** unless we use additional constraints or solve it as an optimization problem.
 
 **Simplified moment balance** (dividing by $l_2$):
 
-$$T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2) = \frac{1}{2} m_2 g \cos(q_2)$$
+$$T_1 \sin(\alpha_1 + q_1 + q_2) + T_2 \sin(\alpha_2 + q_1 + q_2) = \frac{1}{2} m_2 g \cos(q_2)$$
 
 \textbf{Step 2: Matrix System Solution for Two-Cable Tensions}
 
@@ -1365,15 +1322,15 @@ For the **two-cable system**, we cannot derive individual tensions analytically 
 **Method 1: Cable-Length Constraint Approach**
 
 The cable tensions $T_1$ and $T_2$ must satisfy both:
-1. **Force equilibrium** (equations 412a, 412b)  
+1. **Force equilibrium** (from Link 2 system (420))  
 2. **Cable length constraints** (cables cannot push)
-3. **Moment equilibrium** (equation 412c)
+3. **Moment equilibrium** (from Link 2 system (420))
 
 **Matrix formulation**:
 $$\begin{bmatrix}
 -\cos(\alpha_1) & -\cos(\alpha_2) \\
 -\sin(\alpha_1) & -\sin(\alpha_2) \\
-\sin(\alpha_1 + q_2) & \sin(\alpha_2 + q_2)
+\sin(\alpha_1 + q_1 + q_2) & \sin(\alpha_2 + q_1 + q_2)
 \end{bmatrix} \begin{bmatrix} T_1 \\ T_2 \end{bmatrix} = \begin{bmatrix} X_A \\ Y_A - m_2 g \\ \frac{m_2 g \cos(q_2)}{2 l_2} \end{bmatrix}$$
 
 **Key Insight**: This is an **overconstrained system** (3 equations, 2 unknowns). For a solution to exist:
@@ -1410,7 +1367,7 @@ The **Moore-Penrose pseudoinverse** solution is:
 
 **Method B: Cable Force Distribution**
 
-Using the **force balance equations** (412a, 412b) with the **moment constraint** (412c):
+Using the **force balance equations** from Link 2 system (420) with the **moment constraint**:
 
 From horizontal equilibrium: $T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2) = -X_A$
 From vertical equilibrium: $T_1 \sin(\alpha_1) + T_2 \sin(\alpha_2) = -Y_A + m_2 g$
@@ -1498,11 +1455,11 @@ For a valid and consistent solution:
     \item \textbf{Cable tension positivity}: Both $T_1 \geq 0$ and $T_2 \geq 0$
     
     \item \textbf{Force equilibrium verification}:
-    $$X_A = -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2) \quad \text{(from equation 412a)}$$
-    $$Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) \quad \text{(from equation 412b)}$$
+    $$X_A = -T_1 \cos(\alpha_1) - T_2 \cos(\alpha_2) \quad \text{(from Link 2 system (420))}$$
+    $$Y_A = m_2 g - T_1 \sin(\alpha_1) - T_2 \sin(\alpha_2) \quad \text{(from Link 2 system (420))}$$
     
     \item \textbf{Moment equilibrium verification}:
-    $$l_2[T_1 \sin(\alpha_1 + q_2) + T_2 \sin(\alpha_2 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2) \quad \text{(equation 412c)}$$
+    $$l_2[T_1 \sin(\alpha_1 + q_1 + q_2) + T_2 \sin(\alpha_2 + q_1 + q_2)] = \frac{1}{2} m_2 g l_2 \cos(q_2) \quad \text{(Link 2 system (420))}$$
 \end{enumerate}
 
 \textbf{Step 4: Complete System Verification Algorithm}
@@ -1539,11 +1496,11 @@ After systematic verification and correction of the equilibrium equations, the a
 \textbf{Issues That Have Been Resolved:}
 
 \begin{enumerate}
-    \item \textbf{CORRECTED Equation (411a):} Now correctly expresses $X_m = T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2)$ representing horizontal force transmission through the linkage.
+    \item \textbf{CORRECTED Sequential Solution:} Link 1 system (419) now correctly expresses $X_m = T_1 \cos(\alpha_1) + T_2 \cos(\alpha_2)$ representing horizontal force transmission through the linkage.
     
     \item \textbf{ELIMINATED Dimensional Inconsistency:} Removed the incorrect mixing of force [N] and torque [N$\cdot$m] units in the equilibrium framework.
     
-    \item \textbf{UPDATED Cable Force Representation:} Both cable tensions $T_1$ and $T_2$ are now properly included in all force balance equations (412a) and (412b).
+    \item \textbf{UPDATED Cable Force Representation:} Both cable tensions $T_1$ and $T_2$ are now properly included in Link 2 equilibrium system (420).
 \end{enumerate}
 
 \textbf{Corrected Equilibrium Framework:}
@@ -1604,7 +1561,7 @@ $$\begin{bmatrix}
     \item \textbf{Replace the 6×6 system} with the two separate systems above
     \item \textbf{First solve cable tensions} from the $2 \times 2$ Jacobian system  
     \item \textbf{Then solve reaction forces} from the individual link equilibrium equations
-    \item \textbf{Verify consistency} by checking that all original equations (411)-(412) are satisfied
+    \item \textbf{Verify consistency} by checking that both equilibrium systems (419) and (420) are satisfied sequentially
 \end{enumerate}
 
 This approach eliminates dimensional inconsistencies and provides a clear, physically meaningful solution path that properly represents the cable-driven system dynamics.
@@ -1773,7 +1730,7 @@ $$\begin{bmatrix}
 -\sin(\alpha_1) & -\sin(\alpha_2)
 \end{bmatrix} \begin{bmatrix} T_1 \\ T_2 \end{bmatrix} = \begin{bmatrix} X_A \\ Y_A - m_2 g \end{bmatrix}$$
 
-**Step 3:** Verify moment constraint (equation 412c):
+**Step 3:** Verify moment constraint from Link 2 system (420):
 $$l_2[T_1\sin(\alpha_1+q_2) + T_2\sin(\alpha_2+q_2)] = \frac{1}{2}m_2 g l_2 \cos(q_2)$$
 
 In practice, use computational tools to:
@@ -1831,26 +1788,26 @@ This wrench analysis demonstrates why singularities are critical failure points 
 
 \textbf{CRITICAL ERRORS Identified and Corrected:}
 \begin{enumerate}
-    \item \textbf{Dimensional inconsistency}: Original equation (411a) $X_m + \tau_1 = 0$ incorrectly mixed force [N] and torque [N$\cdot$m] units
+    \item \textbf{Dimensional inconsistency}: Previous formulations incorrectly mixed force [N] and torque [N$\cdot$m] units
     \item \textbf{Matrix formulation errors}: The 6×6 matrix system contained multiple structural and dimensional errors
-    \item \textbf{Missing equilibrium equations}: Link 2 moment balance equation (412c) was not properly represented
+    \item \textbf{Missing equilibrium equations}: Link equilibrium equations were not properly separated and sequenced
     \item \textbf{Coordinate system confusion}: Mixed joint-based and end-effector-based coordinate systems inappropriately
 \end{enumerate}
 
 \textbf{IMPLEMENTED Corrections:}
 \begin{enumerate}
-    \item \textbf{Separated the problem}: Split into cable tension determination (2×2 Jacobian system) and link force balance (separate 3×3 systems)
-    \item \textbf{Resolved dimensional issues}: Clarified that cable tensions are determined by torque equilibrium, then internal forces follow from link analysis
-    \item \textbf{Provided proper framework}: Established clear hierarchy - cable tensions → joint torques → internal forces
-    \item \textbf{Maintained mathematical rigor}: All corrections preserve the fundamental physics while eliminating inconsistencies
+    \item \textbf{Sequential solution methodology}: Implemented Link 2 system (420) for cable tension determination, then Link 1 system (419) for internal forces
+    \item \textbf{Resolved dimensional issues}: Cable tensions determined from complete force and moment equilibrium, eliminating unit inconsistencies
+    \item \textbf{Provided proper framework}: Established clear solution sequence - Link 2 equilibrium → cable tensions → Link 1 equilibrium → internal forces
+    \item \textbf{Maintained mathematical rigor}: All corrections preserve fundamental physics while providing consistent, solvable framework
 \end{enumerate}
 
 \textbf{RECOMMENDED Action Items:}
 \begin{enumerate}
-    \item \textbf{Replace the 6×6 matrix system} with the corrected two-stage approach
-    \item \textbf{Implement the separated solution strategy} for computational implementations
-    \item \textbf{Verify numerical examples} using the corrected framework
-    \item \textbf{Update any dependent sections} that reference the original matrix formulation
+    \item \textbf{Use the sequential solution methodology} with systems (419) and (420) for all implementations
+    \item \textbf{Implement the two-stage solution strategy} for computational implementations
+    \item \textbf{Verify numerical examples} using the corrected Link 2 → Link 1 sequential framework
+    \item \textbf{All dependent sections} now reference the corrected equilibrium systems consistently
 \end{enumerate}
 
 The corrected section now provides a mathematically consistent and physically meaningful analysis of wrench balance and force transmission in the cable-driven planar robot, suitable for both theoretical analysis and practical implementation.
