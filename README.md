@@ -1,4 +1,5 @@
 # Singularity Analysis of a Hybrid Serial-Cable Driven Planar Robot
+<img width="892" height="696" alt="image" src="https://github.com/user-attachments/assets/6afdd198-85b2-4c48-abd5-61a060424cd4" />
 
 **Author**: Mourad
 
